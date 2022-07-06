@@ -1,7 +1,5 @@
 from threading import Lock
-#! teste comentário
-#* outro comentário
-# teste testante
+
 #  A total alteração deste arquivo é permitida.
 #  Lembre-se de que algumas variáveis globais são setadas no arquivo simulation.py
 #  Portanto, ao alterá-las aqui, tenha cuidado de não modificá-las. 
