@@ -15,7 +15,7 @@ class StoreHouse(Thread):
 
     def __init__(self, unities, location, constraint):
         Thread.__init__(self)
-        self.unities = unities  # ! Região crítica podemos ter valores errados
+        self.unities = unities  # ! Região crítica, podemos ter valores errados
         self.location = location
         self.constraint = constraint
 
@@ -28,6 +28,7 @@ class StoreHouse(Thread):
             if(self.unities < self.constraint):
                 self.unities += 15
                 self.print_store_house()
+
         sleep(0.001)
 
     def run(self):

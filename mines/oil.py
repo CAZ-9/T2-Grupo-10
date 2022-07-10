@@ -14,7 +14,7 @@ class Pipeline(Thread):
 
     def __init__(self, unities, location, constraint):
         Thread.__init__(self)
-        self.unities = unities  #! Região crítica podemos ter valores errados
+        self.unities = unities  #! Região crítica, podemos ter valores errados
         self.location = location
         self.constraint = constraint
 
