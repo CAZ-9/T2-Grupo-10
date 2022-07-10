@@ -52,9 +52,12 @@ class SpaceBase(Thread):
 
     def refuel_oil():
         # TODO: acessa self.unities mas com pipeline
-        with globals.pipeline:
+        with globals.pipeline_consumidor:
+            with globals.pipeline_units:
+                globals.get_mines_ref()['oil_earth'].unities -= 5
 
-        pass
+            lugares_pipeline.release()
+            pass
 
     def refuel_uranium():
         pass

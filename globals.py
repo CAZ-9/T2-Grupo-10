@@ -1,5 +1,5 @@
 from multiprocessing import Semaphore
-from threading import Lock
+from threading import Lock, Condition
 
 #  A total alteração deste arquivo é permitida.
 #  Lembre-se de que algumas variáveis globais são setadas no arquivo simulation.py
@@ -76,10 +76,20 @@ def get_simulation_time():
     global simulation_time
     return simulation_time
 
+
 # * Sincronização para abastecimento das bases:
-pipeline = Lock()     # Protege a região critica Pipeline.unities
-store_house = Lock()  # Protege a região critica StoreHouse.unities
-itens_pipeline = Semaphore(0)
-lugares_pipelina = Semaphore(get_mines_ref()['oil_earth'].constraint)
-itens_store_house = Semaphore(0)
-lugares_store_house = Semaphore(get_mines_ref()['uranium_earth'].constraint)
+
+# Protege a região critica Pipeline.unities:
+pipeline_units = Lock()
+# Faz dois consumidores não acessarem a região crítica
+pipeline_consumidor = Lock()
+# Condition para consumir oil
+pipeline_itens = Condition(pipeline_units)
+
+
+# Protege a região critica StoreHouse.unities:
+store_house_units = Lock()
+# Faz dois consumidores não acessarem a região crítica:
+store_house_consumidor = Lock()
+# Condition para consumir
+store_house_itens = Condition(store_house_units)
