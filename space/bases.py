@@ -3,6 +3,7 @@ from threading import Thread
 from space.rocket import Rocket
 from random import choice
 
+
 class SpaceBase(Thread):
 
     ################################################
@@ -18,7 +19,7 @@ class SpaceBase(Thread):
 
     def print_space_base_info(self):
         print(f"🔭 - [{self.name}] → 🪨  {self.uranium}/{self.constraints[0]} URANIUM  ⛽ {self.fuel}/{self.constraints[1]}  🚀 {self.rockets}/{self.constraints[2]}")
-    
+
     def base_rocket_resources(self, rocket_name):
         match rocket_name:
             case 'DRAGON':
@@ -49,12 +50,11 @@ class SpaceBase(Thread):
             case _:
                 print("Invalid rocket name")
 
-
     def refuel_oil():
         pass
 
     def refuel_uranium():
-        pass   
+        pass
 
     def run(self):
         globals.acquire_print()

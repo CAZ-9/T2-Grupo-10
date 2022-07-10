@@ -1,12 +1,13 @@
 from threading import Thread
 import globals
 
+
 class Planet(Thread):
 
     ################################################
     # O CONSTRUTOR DA CLASSE NÃO PODE SER ALTERADO #
     ################################################
-    def __init__(self, terraform,name):
+    def __init__(self, terraform, name):
         Thread.__init__(self)
         self.terraform = terraform
         self.name = name
@@ -16,7 +17,8 @@ class Planet(Thread):
             before_percentage = self.terraform
             while(before_percentage == self.terraform):
                 pass
-            print(f"[NUKE DETECTION] - The planet {self.name} was bombed. {self.terraform}% UNHABITABLE")
+            print(
+                f"[NUKE DETECTION] - The planet {self.name} was bombed. {self.terraform}% UNHABITABLE")
 
     def print_planet_info(self):
         print(f"🪐 - [{self.name}] → {self.terraform}% UNINHABITABLE")
