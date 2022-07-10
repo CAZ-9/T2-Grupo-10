@@ -1,5 +1,5 @@
 import globals
-from threading import Thread
+from threading import Thread,Lock
 from space.rocket import Rocket
 from random import choice
 
@@ -16,6 +16,11 @@ class SpaceBase(Thread):
         self.fuel = 0
         self.rockets = 0
         self.constraints = [uranium, fuel, rockets]
+
+    moon_constraints = Lock()
+    alcantara_constraints = Lock()
+    canaveral_constraints = Lock()
+    moscou_constraints = Lock()
 
     def print_space_base_info(self):
         print(f"🔭 - [{self.name}] → 🪨  {self.uranium}/{self.constraints[0]} URANIUM  ⛽ {self.fuel}/{self.constraints[1]}  🚀 {self.rockets}/{self.constraints[2]}")
@@ -49,6 +54,7 @@ class SpaceBase(Thread):
                         self.fuel = self.fuel - 115
             case _:
                 print("Invalid rocket name")
+        
 
     def refuel_oil():
         with globals.pipeline_consumidor:
@@ -66,13 +72,21 @@ class SpaceBase(Thread):
         self.print_space_base_info()
         globals.release_print()
 
-        while(globals.get_release_system() == False):
-            pass
+        self.rockets = []
+        random_rockets = ['DRAGON','FALCON']
 
         while(True):
+            if (globals.get_release_system()):
+                return
             self.refuel_oil()
             self.refuel_uranium()
-            pass
+            
+            if self.name == 'MOON':
+                if self.uranium > 35 and self.
+
+
+            self.base_rocket_resources(choice(random_rockets))
+
 
     def launch_rocket():
         pass
