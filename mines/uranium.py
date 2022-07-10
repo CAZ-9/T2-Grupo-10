@@ -24,7 +24,7 @@ class StoreHouse(Thread):
             f"🔨 - [{self.location}] - {self.unities} uranium unities are produced.")
 
     def produce(self):
-        with globals.store_house:  # * Acesso a store_house
+        with globals.store_house_units:  # * Acesso a store_house_units
             if(self.unities < self.constraint):
                 self.unities += 15
                 self.print_store_house()

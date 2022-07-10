@@ -51,9 +51,9 @@ class SpaceBase(Thread):
                 print("Invalid rocket name")
 
     def refuel_oil():
-        # TODO: acessa self.unities mas com pipeline
         with globals.pipeline_consumidor:
             with globals.pipeline_units:
+
                 globals.get_mines_ref()['oil_earth'].unities -= 5
 
             lugares_pipeline.release()

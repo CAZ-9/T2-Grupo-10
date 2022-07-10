@@ -14,7 +14,7 @@ class Pipeline(Thread):
 
     def __init__(self, unities, location, constraint):
         Thread.__init__(self)
-        self.unities = unities  #! Região crítica, podemos ter valores errados
+        self.unities = unities  # ! Região crítica, podemos ter valores errados
         self.location = location
         self.constraint = constraint
 
@@ -24,7 +24,7 @@ class Pipeline(Thread):
         )
 
     def produce(self):
-        with globals.pipeline:  #* Acesso a pipeline
+        with globals.pipeline_units:  # * Acesso a pipeline_units
             if(self.unities < self.constraint):
                 self.unities += 17
                 self.print_pipeline()
