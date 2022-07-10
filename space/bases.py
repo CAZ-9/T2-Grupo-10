@@ -56,7 +56,6 @@ class SpaceBase(Thread):
 
                 globals.get_mines_ref()['oil_earth'].unities -= 5
 
-            lugares_pipeline.release()
             pass
 
     def refuel_uranium():
@@ -74,3 +73,8 @@ class SpaceBase(Thread):
             self.refuel_oil()
             self.refuel_uranium()
             pass
+
+    def launch_rocket():
+        pass
+
+    
