@@ -52,6 +52,8 @@ class SpaceBase(Thread):
 
     def refuel_oil():
         # TODO: acessa self.unities mas com pipeline
+        with globals.pipeline:
+
         pass
 
     def refuel_uranium():
@@ -66,5 +68,6 @@ class SpaceBase(Thread):
             pass
 
         while(True):
-
+            self.refuel_oil()
+            self.refuel_uranium()
             pass
