@@ -15,6 +15,10 @@ bases = {}
 mines = {}
 simulation_time = None
 
+# * Semáforos para abastecimento das bases:
+pipeline = Lock()     # Protege a região critica Pipeline.unities
+store_house = Lock()  # Protege a região critica StoreHouse.unities
+
 
 def acquire_print():
     global mutex_print

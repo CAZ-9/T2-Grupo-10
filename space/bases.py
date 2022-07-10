@@ -51,6 +51,7 @@ class SpaceBase(Thread):
                 print("Invalid rocket name")
 
     def refuel_oil():
+        # TODO: acessa self.unities mas com pipeline
         pass
 
     def refuel_uranium():
