@@ -84,3 +84,6 @@ class SpaceBase(Thread):
                 if self.uranium > 35 and self.
 
             self.base_rocket_resources(choice(random_rockets))
+
+            # TODO instanciar um foguete, colocar na lista da base
+            # TODO: tentar lançar foguete chamando Rocket.launch

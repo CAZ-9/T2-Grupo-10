@@ -27,6 +27,7 @@ class Rocket:
         # Essa chamada de código (do_we_have_a_problem e simulation_time_voyage) não pode ser retirada.
         # Você pode inserir código antes ou depois dela e deve
         # usar essa função.
+
         self.simulation_time_voyage(planet)
         failure = self.do_we_have_a_problem()
         self.nuke(planet)
@@ -72,5 +73,10 @@ class Rocket:
 
     def launch(self, base, planet):
         if(self.successfull_launch(base)):
+
+            # TODO Cria thread do foguete
+
             print(f"[{self.name} - {self.id}] launched.")
-            self.voyage(planet)
+
+            # TODO Inicializa a thread com a função voyage
+            self.voyage(planet)  # ! Remover quando
