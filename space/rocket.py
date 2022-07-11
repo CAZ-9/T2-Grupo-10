@@ -26,21 +26,43 @@ class Rocket:
         pass
 
     def voyage(self, planet):  # Permitida a alteração (com ressalvas)
+        # Thread da base cria a thread que faz launch
+
+        # TODO lua deve estar em wait
+        # TODO alterar lógica para dar notify pra lua se o foguete for lion
+        if(self.name == 'MOON'):
+            # TODO abastecer a lua
+            return
 
         # Essa chamada de código (do_we_have_a_problem e simulation_time_voyage) não pode ser retirada.
         # Você pode inserir código antes ou depois dela e deve
         # usar essa função.
-        # TODO alterar lógica para dar notify pra lua se o foguete for lion
-        # TODO lua deve estar em wait
-        self.simulation_time_voyage(planet)     # Planeta está viajando
+
+        self.simulation_time_voyage(planet)     # Rocket está viajando
         failure = self.do_we_have_a_problem()   # Testa falha
         if failure == False:                    # Se não ouveuma falha
             self.nuke(planet)                   # Planeta é bombardeado
 
-    ####################################################
-    #                   ATENÇÃO                        #
-    #     AS FUNÇÕES ABAIXO NÃO PODEM SER ALTERADAS    #
-    ###################################################
+    # Retorna o planeta e o polo que o foguete deve viajar
+    def planning_launch(self, planet):
+        if(self.name == 'LION'):  # ! and?  preciso saber qual o request da lua para enviar lion para retornar lua
+            planet = 'MOON'
+            return
+
+        # TODO semáforo n=2 locking=false para garantir que não serão 3 nukes no mesmo planeta
+        #! três bombas ou mais não podem chegassem ao mesmo tempo
+        #! mais de uma bomba não pode atingir o mesmo polo ao mesmo tempo
+        globals.voyage_mars.acquire(blocking=False)
+
+        # 'MARS'
+        # 'IO'
+        # 'GANIMEDES'
+        # 'EUROPA'
+
+        ####################################################
+        #                   ATENÇÃO                        #
+        #     AS FUNÇÕES ABAIXO NÃO PODEM SER ALTERADAS    #
+        ###################################################
 
     def simulation_time_voyage(self, planet):
         if planet.name == 'MARS':
@@ -77,19 +99,6 @@ class Rocket:
         return random()
 
     def launch(self, base, planet):
-
-        # match planet:
-        #   case ''
-
-        # TODO semáforo n=2 locking=false para garantir que não serão 3 nukes no mesmo planeta
-        #! três bombas ou mais não podem chegassem ao mesmo tempo
-        #! mais de uma bomba não pode atingir o mesmo polo ao mesmo tempo
-
         if(self.successfull_launch(base)):
             print(f"[{self.name} - {self.id}] launched.")
-
-            # * Cria thread do foguete com a função voyage
-
-            rocket_thread = Thread(name=self.id, target=self.voyage(planet))
-
-            rocket_thread.start()  # Inicializa a thread
+            self.voyage(planet)
