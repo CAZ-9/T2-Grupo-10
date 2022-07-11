@@ -1,6 +1,7 @@
 from random import randrange, random
 from time import sleep
 from threading import Thread, current_thread
+import globals
 
 
 class Rocket:
