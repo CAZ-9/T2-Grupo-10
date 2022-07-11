@@ -24,10 +24,13 @@ class StoreHouse(Thread):
             f"🔨 - [{self.location}] - {self.unities} uranium unities are produced.")
 
     def produce(self):
-        with globals.store_house_units:  # * Acesso a store_house_units
+        with globals.store_house_units:  # Acesso a store_house_units
             if(self.unities < self.constraint):
                 self.unities += 15
                 self.print_store_house()
+                # Faz a divisão inteira, para saber quantos poderão abastecer
+                n = 15//globals.uraniun_units
+                globals.uranium_avaliable.release(n)
 
         sleep(0.001)
 
@@ -36,9 +39,7 @@ class StoreHouse(Thread):
         self.print_store_house()
         globals.release_print()
 
-        # ! Não posso alterar? Nunca serão finalizadas essa thread
-        while(globals.get_release_system() == False):
-            pass
-
         while(True):
+            if (globals.get_release_system()):
+                return  # finaliza a thread
             self.produce()

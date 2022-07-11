@@ -24,10 +24,13 @@ class Pipeline(Thread):
         )
 
     def produce(self):
-        with globals.pipeline_units:  # * Acesso a pipeline_units
+        with globals.pipeline_units:  # Acesso a pipeline_units
             if(self.unities < self.constraint):
                 self.unities += 17
                 self.print_pipeline()
+                # Faz a divisão inteira, para saber quantos poderão abastecer
+                n = 17//globals.oil.units  # ! a cada 5 carregamentos +2 deverão acontecer
+                globals.oil_avaliable.release(n)  # ! Espero um value error
 
         sleep(0.001)
 
@@ -36,11 +39,7 @@ class Pipeline(Thread):
         self.print_pipeline()
         globals.release_print()
 
-        # ! Não posso alterar? Nunca sera finalizada essa thread
-        # while(globals.get_release_system() == False):
-        #    pass
-
         while(True):
             if (globals.get_release_system()):
-                return
+                return  # finaliza a thread
             self.produce()

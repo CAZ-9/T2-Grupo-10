@@ -62,15 +62,26 @@ class SpaceBase(Thread):
         print(f'{self.name}: Construindo foguete {rocket}')
         globals.release_print()
 
-    def refuel_oil():
-        with globals.pipeline_consumidor:
-            with globals.pipeline_units:
+    def refuel_oil(self):  # * Só aguardo se tenho espaço e se estiver disponível
+        if self.fuel < self.constraints[1]:  # oil não cheio
+            print(f'\n67\n')
+            # Existe oil disponível? Se não, tenho trabalho a fazer
+            if globals.oil_avaliable.acquire(blocking=False):
+                # Existe oil disponível! Aguarda para receber
+                with globals.pipeline_units:
+                    globals.get_mines_ref()[
+                        'oil_earth'].unities -= globals.oil_units
+                self.fuel += globals.oil_units
 
-                globals.get_mines_ref()['oil_earth'].unities -= 5
-
-            pass
-
-    def refuel_uranium():
+    def refuel_uranium(self):
+        if self.uranium < self.constraints[0]:  # urânio não cheio
+            # Existe urânio disponível? Se não, tenho trabalho a fazer
+            if globals.uranium_avaliable.acquire(blocking=False):
+                # Existe urânio disponível! Aguarda para receber
+                with globals.store_house_units:
+                    globals.get_mines_ref()[
+                        'uranium_earth'].unities -= globals.uranium_units
+                self.uranium += globals.uranium_units
         pass
 
     def can_i_build_the_rocket(self, choiced):
@@ -111,7 +122,7 @@ class SpaceBase(Thread):
 
         while(True):
             if (globals.get_release_system()):
-                return # finaliza a thread
+                return  # finaliza a thread
 
             # Se MOON, verificar se precisa de recurso
             # TODO determinar numero de fuel
@@ -160,9 +171,7 @@ class SpaceBase(Thread):
                 else:
                     choiced_to_launch = choice(self.rockets)
 
-                destination = choiced_to_launch.planning_launch() # qual planeta
-                
-
+                destination = choiced_to_launch.planning_launch()  # qual planeta
 
             # TODO planing_launch
 

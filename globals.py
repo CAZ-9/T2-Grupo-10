@@ -44,10 +44,17 @@ voyage_europa = Semaphore(2)
 # Se lock estiver travado rota para o polo sul
 europa_north_pole = Lock()
 
+oil_units = 5       # Valor base para receber oil
+uraniun_units = 5   # Valor base para receber urânio
+
 # * Sincronização para abastecimento das bases:
 
 # Protege a região critica Pipeline.unities:
 pipeline_units = Lock()
+# Quantas unidades de óleo estão disponíveis?
+oil_avaliable = Semaphore(0)
+# Quantas unidades de urânio estão disponíveis?
+uranium_avaliable = Semaphore(0)
 # Faz dois consumidores não acessarem a região crítica
 pipeline_consumidor = Lock()
 # Condition para consumir oil
