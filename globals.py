@@ -18,8 +18,26 @@ mines = {}
 simulation_time = None
 
 # TODO lua seta true se precisar de recursos (não sei se vai ficar esse semáforo)
-lion_launch = Semaphore(0) 
+moon_ask_lion_launch = Semaphore(0)
+lock_lion_lauch = Lock()
+moon_wait = Condition(lock_lion_lauch) 
 
+# * Sincronização para abastecimento das bases:
+
+# Protege a região critica Pipeline.unities:
+pipeline_units = Lock()
+# Faz dois consumidores não acessarem a região crítica
+pipeline_consumidor = Lock()
+# Condition para consumir oil
+pipeline_itens = Condition(pipeline_units)
+
+
+# Protege a região critica StoreHouse.unities:
+store_house_units = Lock()
+# Faz dois consumidores não acessarem a região crítica:
+store_house_consumidor = Lock()
+# Condition para consumir
+store_house_itens = Condition(store_house_units)
 
 def acquire_print():
     global mutex_print
@@ -81,19 +99,4 @@ def get_simulation_time():
     return simulation_time
 
 
-# * Sincronização para abastecimento das bases:
 
-# Protege a região critica Pipeline.unities:
-pipeline_units = Lock()
-# Faz dois consumidores não acessarem a região crítica
-pipeline_consumidor = Lock()
-# Condition para consumir oil
-pipeline_itens = Condition(pipeline_units)
-
-
-# Protege a região critica StoreHouse.unities:
-store_house_units = Lock()
-# Faz dois consumidores não acessarem a região crítica:
-store_house_consumidor = Lock()
-# Condition para consumir
-store_house_itens = Condition(store_house_units)
