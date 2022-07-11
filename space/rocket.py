@@ -30,7 +30,7 @@ class Rocket:
 
         # TODO lua deve estar em wait
         # TODO alterar lógica para dar notify pra lua se o foguete for lion
-        if(self.name == 'MOON'):
+        if (planet == 'MOON'):
             # TODO abastecer a lua
             return
 
@@ -41,23 +41,36 @@ class Rocket:
         self.simulation_time_voyage(planet)     # Rocket está viajando
         failure = self.do_we_have_a_problem()   # Testa falha
         if failure == False:                    # Se não ouveuma falha
+            #! mais de uma bomba não pode atingir o mesmo polo ao mesmo tempo
             self.nuke(planet)                   # Planeta é bombardeado
 
     # Retorna o planeta e o polo que o foguete deve viajar
-    def planning_launch(self, planet):
-        if(self.name == 'LION'):  # ! and?  preciso saber qual o request da lua para enviar lion para retornar lua
+    def planning_launch(self):
+        if(self.name == 'LION'):
             planet = 'MOON'
-            return
+            return planet
 
-        # TODO semáforo n=2 locking=false para garantir que não serão 3 nukes no mesmo planeta
-        #! três bombas ou mais não podem chegassem ao mesmo tempo
-        #! mais de uma bomba não pode atingir o mesmo polo ao mesmo tempo
-        globals.voyage_mars.acquire(blocking=False)
+        # Semáforos n=2 para garantir que não serão 3 impactos simultâneos
+        # Se >0 decrementa, mas não bloqueia
+        elif globals.voyage_mars.acquire(blocking=False):
+            planet = 'MARS'
+            return planet
 
-        # 'MARS'
-        # 'IO'
-        # 'GANIMEDES'
-        # 'EUROPA'
+        elif globals.voyage_io.acquire(blocking=False):
+            planet = 'IO'
+            return planet
+
+        elif globals.voyage_ganimedes.acquire(blocking=False):
+            planet = 'GANIMEDES'
+            return planet
+
+        elif globals.voyage_europa.acquire(blocking=False):
+            planet = 'EUROPA'
+            return planet
+
+        else:
+            print(f'Lançamento não autorizado! Aguarde o fim de uma missão! 👩‍🚀')
+            return False
 
         ####################################################
         #                   ATENÇÃO                        #
