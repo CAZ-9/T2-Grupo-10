@@ -1,3 +1,4 @@
+from pickle import FALSE, TRUE
 import globals
 from threading import Thread, Lock
 from space.rocket import Rocket
@@ -36,6 +37,7 @@ class SpaceBase(Thread):
                         self.fuel = self.fuel - 50
                     else:
                         self.fuel = self.fuel - 100
+                    rocket = Rocket('DRAGON') # constrói foguete 
             case 'FALCON':
                 if self.uranium > 35 and self.fuel > 90:
                     self.uranium = self.uranium - 35
@@ -45,6 +47,7 @@ class SpaceBase(Thread):
                         self.fuel = self.fuel - 90
                     else:
                         self.fuel = self.fuel - 120
+                    rocket = Rocket('FALCON') # constrói foguete 
             case 'LION':
                 if self.uranium > 35 and self.fuel > 100:
                     self.uranium = self.uranium - 35
@@ -52,8 +55,12 @@ class SpaceBase(Thread):
                         self.fuel = self.fuel - 100
                     else:
                         self.fuel = self.fuel - 115
+                    rocket = Rocket('LION') # constrói foguete 
             case _:
                 print("Invalid rocket name")
+                return
+        
+        self.rockets.append(rocket) # adiciona foguete ao armazenamento da base
 
     def refuel_oil():
         with globals.pipeline_consumidor:
@@ -77,13 +84,25 @@ class SpaceBase(Thread):
         while(True):
             if (globals.get_release_system()):
                 return
-            self.refuel_oil()
-            self.refuel_uranium()
+            
+            # Se MOON verificar se precisa de recursos
+            if (self.name == 'MOON' and self.uranium <= 75 and self.fuel <= 70):
+                # TODO fazer sincronização quando moon precisar de recurso
+                globals.lion_launch.release()
+            
+            # Se não MOON coleta recurso das minas    
+            else: 
+                self.refuel_oil()
+                self.refuel_uranium()
 
-            if self.name == 'MOON':
-                if self.uranium > 35 and self.
-
-            self.base_rocket_resources(choice(random_rockets))
+            # Constrói foguete se base não cheia
+            if len(self.rockets <= self.constraints[2]): 
+                
+                # TODO Construir lion se MOON precisa de recursos
+                self.base_rocket_resources('LION')
+                
+                # TODO Construir DRAGON ou FALCON
+                self.base_rocket_resources(choice(random_rockets))
 
             # TODO instanciar um foguete, colocar na lista da base
             # TODO: tentar lançar foguete chamando Rocket.launch
