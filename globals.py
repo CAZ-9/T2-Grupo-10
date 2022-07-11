@@ -1,4 +1,5 @@
 from multiprocessing import Semaphore
+from pickle import FALSE
 from threading import Lock, Condition
 
 #  A total alteração deste arquivo é permitida.
@@ -15,6 +16,9 @@ planets = {}
 bases = {}
 mines = {}
 simulation_time = None
+
+# TODO lua seta true se precisar de recursos (não sei se vai ficar esse semáforo)
+lion_launch = Semaphore(0) 
 
 
 def acquire_print():
