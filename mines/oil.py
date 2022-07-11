@@ -36,8 +36,11 @@ class Pipeline(Thread):
         self.print_pipeline()
         globals.release_print()
 
-        while(globals.get_release_system() == False):
-            pass
+        # ! Não posso alterar? Nunca sera finalizada essa thread
+        # while(globals.get_release_system() == False):
+        #    pass
 
         while(True):
+            if (globals.get_release_system()):
+                return
             self.produce()

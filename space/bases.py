@@ -114,10 +114,11 @@ class SpaceBase(Thread):
                 return
 
             # Se MOON, verificar se precisa de recurso
-            if (self.name == 'MOON' and self.uranium <= 75 and self.fuel <= 70): # TODO determinar numero de fuel
-                # TODO Lua pode pedir foguetes consecutivos !!ALTERAR                
+            # TODO determinar numero de fuel
+            if (self.name == 'MOON' and self.uranium <= 75 and self.fuel <= 70):
+                # TODO Lua pode pedir foguetes consecutivos !!ALTERAR
                 if globals.alredy_asked == True:
-                    globals.moon_ask_lion_launch.release() # Lua solicita recurso
+                    globals.moon_ask_lion_launch.release()  # Lua solicita recurso
                     globals.acquire_print()
                     print('Lua solicita lançamento de foguete LION')
                     globals.release_print()
@@ -139,7 +140,7 @@ class SpaceBase(Thread):
                 if (globals.moon_ask_lion_launch.acquire(blocking=False) and self.uranium >= 75 and self.fuel >= 235):
                     self.build_rocket('LION')
                     # Carregar foguete lion com fuel e uranium
-                    # TODO Condição de corrida na escrita das variaveis das bases !!ARRUMAR 
+                    # TODO Condição de corrida na escrita das variaveis das bases !!ARRUMAR
                     self.rockets[len(self.rockets)-1].fuel_cargo += 120
                     self.fuel -= 120
                     self.rockets[len(self.rockets)-1].uranium_cargo += 75
@@ -151,7 +152,7 @@ class SpaceBase(Thread):
                         choiced_rocket = choice(random_rockets)
                         if (self.can_i_build_the_rocket(choiced_rocket)):
                             self.build_rocket(choiced_rocket)
-            
+
             # decidir qual foguete lançar
             if (len(self.rockets) > 0):
                 if (self.rockets[len(self.rockets)-1].name == 'LION'):
@@ -159,11 +160,8 @@ class SpaceBase(Thread):
                 else:
                     choiced_to_launch = choice(self.rockets)
 
-                destination = choiced_to_launch.planning_launch() # qual planeta
-                
-                
+                destination = choiced_to_launch.planning_launch()  # qual planeta
 
-            
             # TODO planing_launch
 
             # TODO Cria thread do foguete em bases

@@ -36,6 +36,7 @@ class StoreHouse(Thread):
         self.print_store_house()
         globals.release_print()
 
+        # ! Não posso alterar? Nunca serão finalizadas essa thread
         while(globals.get_release_system() == False):
             pass
 

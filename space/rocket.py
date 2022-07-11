@@ -32,6 +32,9 @@ class Rocket:
         # TODO alterar lógica para dar notify pra lua se o foguete for lion
         if (planet == 'MOON'):
             # TODO abastecer a lua
+            # semáforo para receber o lion e fazer o lançamento
+            #! qual o tempo de viagem para a lua?
+            #! self.simulation_time_voyage(planet)     # Rocket está viajando
             return
 
         # Essa chamada de código (do_we_have_a_problem e simulation_time_voyage) não pode ser retirada.
@@ -42,6 +45,7 @@ class Rocket:
         failure = self.do_we_have_a_problem()   # Testa falha
         if failure == False:                    # Se não ouveuma falha
             #! mais de uma bomba não pode atingir o mesmo polo ao mesmo tempo
+            #! Foguete pode orbitar
             self.nuke(planet)                   # Planeta é bombardeado
 
     # Retorna o planeta e o polo que o foguete deve viajar
@@ -114,4 +118,4 @@ class Rocket:
     def launch(self, base, planet):
         if(self.successfull_launch(base)):
             print(f"[{self.name} - {self.id}] launched.")
-            self.voyage(planet)
+            self.voyage(planet)  # !
