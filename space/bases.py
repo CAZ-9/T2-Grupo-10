@@ -111,7 +111,7 @@ class SpaceBase(Thread):
 
         while(True):
             if (globals.get_release_system()):
-                return
+                return # finaliza a thread
 
             # Se MOON, verificar se precisa de recurso
             # TODO determinar numero de fuel
@@ -160,7 +160,9 @@ class SpaceBase(Thread):
                 else:
                     choiced_to_launch = choice(self.rockets)
 
-                destination = choiced_to_launch.planning_launch()  # qual planeta
+                destination = choiced_to_launch.planning_launch() # qual planeta
+                
+
 
             # TODO planing_launch
 
