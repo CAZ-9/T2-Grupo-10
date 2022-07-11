@@ -1,5 +1,6 @@
 from random import randrange, random
 from time import sleep
+from threading import Thread, current_thread
 
 
 class Rocket:
@@ -15,11 +16,13 @@ class Rocket:
             self.uranium_cargo = 0
 
     def nuke(self, planet):  # Permitida a alteração
+
         self.damage()
         print(
             f"[EXPLOSION] - The {self.name} ROCKET reached the planet {planet.name} on North Pole")
         print(
             f"[EXPLOSION] - The {self.name} ROCKET reached the planet {planet.name} on South Pole")
+        # TODO   decrementar a vida do planeta respectivo
         pass
 
     def voyage(self, planet):  # Permitida a alteração (com ressalvas)
@@ -28,9 +31,10 @@ class Rocket:
         # Você pode inserir código antes ou depois dela e deve
         # usar essa função.
 
-        self.simulation_time_voyage(planet)
-        failure = self.do_we_have_a_problem()
-        self.nuke(planet)
+        self.simulation_time_voyage(planet)     # Planeta está viajando
+        failure = self.do_we_have_a_problem()   # Testa falha
+        if failure == False:                    # Se não ouveuma falha
+            self.nuke(planet)                   # Planeta é bombardeado
 
     ####################################################
     #                   ATENÇÃO                        #
@@ -72,11 +76,12 @@ class Rocket:
         return random()
 
     def launch(self, base, planet):
+        # TODO semáforo n=2 para garantir que não serão 3 nukes no mesmo planeta
+
         if(self.successfull_launch(base)):
-
-            # TODO Cria thread do foguete
-
             print(f"[{self.name} - {self.id}] launched.")
 
-            # TODO Inicializa a thread com a função voyage
-            self.voyage(planet)  # ! Remover quando
+            # * Cria thread do foguete com a função voyage
+            rocket_thread = Thread(name=self.id, target=self.voyage(planet))
+
+            rocket_thread.start()  # Inicializa a thread
