@@ -18,11 +18,6 @@ class SpaceBase(Thread):
         self.rockets = 0
         self.constraints = [uranium, fuel, rockets]
 
-    moon_constraints = Lock()
-    alcantara_constraints = Lock()
-    canaveral_constraints = Lock()
-    moscou_constraints = Lock()
-
     def print_space_base_info(self):
         print(f"🔭 - [{self.name}] → 🪨  {self.uranium}/{self.constraints[0]} URANIUM  ⛽ {self.fuel}/{self.constraints[1]}  🚀 {self.rockets}/{self.constraints[2]}")
 
@@ -86,12 +81,17 @@ class SpaceBase(Thread):
             if (globals.get_release_system()):
                 return
 
-            # Se MOON verificar se precisa de recursos
-            if (self.name == 'MOON' and self.uranium <= 75 and self.fuel <= 70):
-                # TODO fazer sincronização quando moon precisar de recurso
-                globals.lion_launch.release()
+            # Se MOON, verificar se precisa de recursos
+            if (self.name == 'MOON' and self.uranium < 35 and self.fuel < 50 and len(self.rockets) == 0):
+                    globals.moon_wait.wait() # TODO incompleto
 
-            # Se não MOON coleta recurso das minas
+            if (self.name == 'MOON' and self.uranium <= 75 and self.fuel <= 70):
+                globals.moon_ask_lion_launch.release() # Lua solicita recurso
+                globals.acquire_print()
+                print('Lua solicita lançamento de foguete LION')
+                globals.release_print()
+
+            # Se !MOON,coleta recurso das minas
             else:
                 self.refuel_oil()
                 self.refuel_uranium()
@@ -99,11 +99,18 @@ class SpaceBase(Thread):
             # Constrói foguete se base não cheia
             if len(self.rockets <= self.constraints[2]):
 
+                
+
                 # TODO Construir lion se MOON precisa de recursos
-                self.base_rocket_resources('LION')
+                if (globals.moon_ask_lion_launch.acquire(blocking=False) and self.uranium >= 75 and self.fuel >= 235): # TODO mudar condicional para fuel 100
+                    globals.acquire_print()
+                    print(f'{self.name}: Construindo foguete LION')
+                    globals.release_print()
+                    self.base_rocket_resources('LION')
 
                 # TODO Construir DRAGON ou FALCON
-                self.base_rocket_resources(choice(random_rockets))
+                else:
+                    self.base_rocket_resources(choice(random_rockets))
 
             # TODO instanciar um foguete, colocar na lista da base
             # TODO: tentar lançar foguete chamando Rocket.launch
