@@ -30,7 +30,8 @@ class Rocket:
         # Essa chamada de código (do_we_have_a_problem e simulation_time_voyage) não pode ser retirada.
         # Você pode inserir código antes ou depois dela e deve
         # usar essa função.
-
+        # TODO alterar lógica para dar notify pra lua se o foguete for lion
+        # TODO lua deve estar em wait
         self.simulation_time_voyage(planet)     # Planeta está viajando
         failure = self.do_we_have_a_problem()   # Testa falha
         if failure == False:                    # Se não ouveuma falha
@@ -76,12 +77,19 @@ class Rocket:
         return random()
 
     def launch(self, base, planet):
-        # TODO semáforo n=2 para garantir que não serão 3 nukes no mesmo planeta
+
+        # match planet:
+        #   case ''
+
+        # TODO semáforo n=2 locking=false para garantir que não serão 3 nukes no mesmo planeta
+        #! três bombas ou mais não podem chegassem ao mesmo tempo
+        #! mais de uma bomba não pode atingir o mesmo polo ao mesmo tempo
 
         if(self.successfull_launch(base)):
             print(f"[{self.name} - {self.id}] launched.")
 
             # * Cria thread do foguete com a função voyage
+
             rocket_thread = Thread(name=self.id, target=self.voyage(planet))
 
             rocket_thread.start()  # Inicializa a thread

@@ -20,7 +20,28 @@ simulation_time = None
 # TODO lua seta true se precisar de recursos (não sei se vai ficar esse semáforo)
 moon_ask_lion_launch = Semaphore(0)
 lock_lion_lauch = Lock()
-moon_wait = Condition(lock_lion_lauch) 
+moon_wait = Condition(lock_lion_lauch)
+
+# * Sincronização para as viagens
+# Garante que apenas 2 foguetes estejam em rota para Marte
+voyage_mars = Semaphore(2)
+# Se lock estiver travado rota para o polo sul
+mars_north_pole = Lock()
+
+# Garante que apenas 2 foguetes estejam em rota para Io
+voyage_io = Semaphore(2)
+# Se lock estiver travado rota para o polo sul
+io_north_pole = Lock()
+
+# Garante que apenas 2 foguetes estejam em rota para Ganimedes
+voyage_ganimedes = Semaphore(2)
+# Se lock estiver travado rota para o polo sul
+ganimedes_north_pole = Lock()
+
+# Garante que apenas 2 foguetes estejam em rota para Europa
+voyage_europa = Semaphore(2)
+# Se lock estiver travado rota para o polo sul
+europa_north_pole = Lock()
 
 # * Sincronização para abastecimento das bases:
 
@@ -38,6 +59,7 @@ store_house_units = Lock()
 store_house_consumidor = Lock()
 # Condition para consumir
 store_house_itens = Condition(store_house_units)
+
 
 def acquire_print():
     global mutex_print
@@ -97,6 +119,3 @@ def set_simulation_time(time):
 def get_simulation_time():
     global simulation_time
     return simulation_time
-
-
-
