@@ -32,7 +32,7 @@ class SpaceBase(Thread):
                         self.fuel = self.fuel - 50
                     else:
                         self.fuel = self.fuel - 100
-            
+
             case 'FALCON':
                 if self.uranium > 35 and self.fuel > 90:
                     self.uranium = self.uranium - 35
@@ -42,7 +42,7 @@ class SpaceBase(Thread):
                         self.fuel = self.fuel - 90
                     else:
                         self.fuel = self.fuel - 120
-                 
+
             case 'LION':
                 if self.uranium > 35 and self.fuel > 100:
                     self.uranium = self.uranium - 35
@@ -50,7 +50,7 @@ class SpaceBase(Thread):
                         self.fuel = self.fuel - 100
                     else:
                         self.fuel = self.fuel - 115
-                  
+
             case _:
                 print("Invalid rocket name")
                 return
@@ -73,38 +73,33 @@ class SpaceBase(Thread):
     def refuel_uranium():
         pass
 
-    def can_i_build_the_rocket(self,choiced):
+    def can_i_build_the_rocket(self, choiced):
         match self.name:
             case 'MOON':
                 if choiced == 'DRAGON' and self.fuel < 50:
                     return
                 elif choiced == 'FALCON' and self.fuel < 90:
                     return
-                
-            
+
             case 'ALCANTARA':
                 if choiced == 'DRAGON' and self.fuel < 70:
                     return False
                 elif choiced == 'FALCON' and self.fuel < 100:
                     return False
-                
-            
+
             case 'CANAVERAL CAPE':
                 if choiced == 'DRAGON' and self.fuel < 100:
                     return False
                 elif choiced == 'FALCON' and self.fuel < 120:
                     return False
-                
 
             case 'MOSCOW':
                 if choiced == 'DRAGON' and self.fuel < 100:
                     return False
                 elif choiced == 'FALCON' and self.fuel < 120:
                     return False
-                
-        
-        return TRUE
 
+        return TRUE
 
     def run(self):
         globals.acquire_print()
@@ -120,8 +115,9 @@ class SpaceBase(Thread):
 
             # Se MOON, verificar se precisa de recursos
 
-            if (self.name == 'MOON' and self.uranium <= 75 and self.fuel <= 70): # TODO determinar numero de fuel
-                globals.moon_ask_lion_launch.release() # Lua solicita recurso
+            # TODO determinar numero de fuel
+            if (self.name == 'MOON' and self.uranium <= 75 and self.fuel <= 70):
+                globals.moon_ask_lion_launch.release()  # Lua solicita recurso
                 globals.acquire_print()
                 print('Lua solicita lançamento de foguete LION')
                 globals.release_print()
@@ -137,7 +133,8 @@ class SpaceBase(Thread):
             if len(self.rockets <= self.constraints[2]):
 
                 # TODO Construir lion se MOON precisa de recursos
-                if (globals.moon_ask_lion_launch.acquire(blocking=False) and self.uranium >= 75 and self.fuel >= 235): # TODO mudar condicional para fuel 100
+                # TODO mudar condicional para fuel 100
+                if (globals.moon_ask_lion_launch.acquire(blocking=False) and self.uranium >= 75 and self.fuel >= 235):
                     self.build_rocket('LION')
 
                 # TODO Construir DRAGON ou FALCON
@@ -147,11 +144,10 @@ class SpaceBase(Thread):
                         if (self.can_i_build_the_rocket(choiced)):
                             self.build_rocket(choiced)
 
-
                 # TODO planing_launch
-                    
+
+                # TODO Cria thread do foguete em bases
+                #rocket_thread = Thread(name=self.id)
+                # rocket_thread.start(target=self.launch)  # Inicializa a thread
 
             # TODO: tentar lançar foguete chamando Rocket.launch
-
-            
-
