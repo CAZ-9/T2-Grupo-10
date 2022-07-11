@@ -19,6 +19,7 @@ simulation_time = None
 
 # TODO lua seta true se precisar de recursos (não sei se vai ficar esse semáforo)
 moon_ask_lion_launch = Semaphore(0)
+alredy_asked = False
 lock_lion_lauch = Lock()
 moon_wait = Condition(lock_lion_lauch)
 

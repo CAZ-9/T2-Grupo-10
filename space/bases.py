@@ -121,12 +121,15 @@ class SpaceBase(Thread):
             # Se MOON, verificar se precisa de recursos
 
             if (self.name == 'MOON' and self.uranium <= 75 and self.fuel <= 70): # TODO determinar numero de fuel
-                globals.moon_ask_lion_launch.release() # Lua solicita recurso
-                globals.acquire_print()
-                print('Lua solicita lançamento de foguete LION')
-                globals.release_print()
+                # TODO Lua pode pedir foguetes consecutivos !!ALTERAR                
+                if globals.alredy_asked == True:
+                    globals.moon_ask_lion_launch.release() # Lua solicita recurso
+                    globals.acquire_print()
+                    print('Lua solicita lançamento de foguete LION')
+                    globals.release_print()
                 if (len(self.rockets) == 0):
                     globals.moon_wait.wait()
+                    globals.alredy_asked == False
 
             # Se !MOON,coleta recurso das minas
             else:
