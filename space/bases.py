@@ -97,6 +97,7 @@ class SpaceBase(Thread):
                     return False
                 elif choiced == 'FALCON' and self.fuel < 100:
                     return False
+                #elif choiced == 'LION' and self.fuel < 
 
             case 'CANAVERAL CAPE':
                 if choiced == 'DRAGON' and self.fuel < 100:
@@ -125,33 +126,35 @@ class SpaceBase(Thread):
                 return  # finaliza a thread
 
             # Se MOON, verificar se precisa de recurso
-            # TODO determinar numero de fuel
-            if (self.name == 'MOON' and self.uranium <= 75 and self.fuel <= 70):
-                # TODO Lua pode pedir foguetes consecutivos !!ALTERAR
-                if globals.alredy_asked == True:
+            if (self.name == 'MOON'and self.uranium <= 75):
+                # TODO !!DEADLOCK NA LUA!! lua pode cair em wait depois de foguete verificar q ela não precisa de notify 
+                globals.lock_lion_launch.acquire() # impede um notify se lua não está em condition.wait()
+                if globals.alredy_asked == False:
                     globals.moon_ask_lion_launch.release()  # Lua solicita recurso
+                    globals.alredy_asked = True # Seta true para não pedir foguetes caso já tenha pedido
                     globals.acquire_print()
                     print('Lua solicita lançamento de foguete LION')
                     globals.release_print()
-                # Se não temm foguetes e recurso para construir, aguarda recusos chegarem
-                if (len(self.rockets) == 0):
+                # Se não tem foguetes para lançar e recursos para construir mais, aguarda recusos chegarem
+                if (len(self.rockets) == 0 and self.uranium < 35 and globals.alredy_asked == True):
                     globals.moon_wait.wait()
-                    globals.alredy_asked == False
+                     # TODO globals.alredy_asked == False Thread foguete setara false qnd chegar na lua
+                globals.lock_lion_launch.release()
 
             # Se !MOON,coleta recurso das minas
             else:
                 self.refuel_oil()
                 self.refuel_uranium()
 
+            # TODO lógica de contrução de foguetes incompleta
             # Constrói foguete se base não cheia
-            if len(self.rockets <= self.constraints[2]):
+            if len(self.rockets) < self.constraints[2]:
 
                 # TODO Construir lion se MOON precisa de recursos
                 # TODO mudar condicional para fuel 100
                 if (globals.moon_ask_lion_launch.acquire(blocking=False) and self.uranium >= 75 and self.fuel >= 235):
                     self.build_rocket('LION')
                     # Carregar foguete lion com fuel e uranium
-                    # TODO Condição de corrida na escrita das variaveis das bases !!ARRUMAR
                     self.rockets[len(self.rockets)-1].fuel_cargo += 120
                     self.fuel -= 120
                     self.rockets[len(self.rockets)-1].uranium_cargo += 75

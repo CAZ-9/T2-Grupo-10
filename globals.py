@@ -17,11 +17,11 @@ bases = {}
 mines = {}
 simulation_time = None
 
-# TODO lua seta true se precisar de recursos (não sei se vai ficar esse semáforo)
-moon_ask_lion_launch = Semaphore(0)
-alredy_asked = False
-lock_lion_lauch = Lock()
-moon_wait = Condition(lock_lion_lauch)
+# Sincronização de pedidos da lua
+moon_ask_lion_launch = Semaphore(0) # Lua da release para solicitar foguete lion
+alredy_asked = False # Impede lua de pedir foguetes caso já tenha pedido
+lock_lion_launch = Lock() # TODO logica desse lock ainda incompleta
+moon_wait = Condition(lock_lion_launch) # Lua aguarda recursos
 
 # * Sincronização para as viagens
 # Garante que apenas 2 foguetes estejam em rota para Marte
@@ -45,7 +45,7 @@ voyage_europa = Semaphore(2)
 europa_north_pole = Lock()
 
 oil_units = 5       # Valor base para receber oil
-uraniun_units = 5   # Valor base para receber urânio
+uranium_units = 5   # Valor base para receber urânio
 
 # * Sincronização para abastecimento das bases:
 
