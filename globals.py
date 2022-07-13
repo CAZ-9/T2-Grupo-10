@@ -20,7 +20,7 @@ simulation_time = None
 # Sincronização de pedidos da lua
 moon_ask_lion_launch = Semaphore(0) # Lua da release para solicitar foguete lion
 alredy_asked = False # Impede lua de pedir foguetes caso já tenha pedido
-lock_lion_launch = Lock() # TODO logica desse lock ainda incompleta
+lock_lion_launch = Lock() # Impede deadlock na lua
 moon_wait = Condition(lock_lion_launch) # Lua aguarda recursos
 
 # * Sincronização para as viagens
