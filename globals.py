@@ -139,10 +139,15 @@ def get_simulation_time():
 
 # * Funções para as minas:
 
-def delivery_control(unities: int('Unidades totais'),
-                     units_ready: ('Variável para armazenar int de n unidades prontas'),
-                     global_material_loads: ('Variável global para armazenar int de cargas de material'),
-                     semaphore: ('Semáforo global para controlar')):
+# Devia ser um método da classe minas
+def delivery_control(unities, units_ready, global_material_loads, semaphore):
+    '''Executa N° releases em semaphore, com base em N° envios possíveis de carga
+    @param int unities: self.unities
+    @param units_ready: Variável para armazenar int de n unidades prontas
+    @param global_material_loads: Variável global para armazenar int de cargas de material
+    @param semaphore: Semáforo global para controlar
+    '''
+
     # Faz a divisão inteira, possuí "x" units_ready
     current_loads = unities // units_ready
     # Tenho um número de cargas igual ou maior que antes?
