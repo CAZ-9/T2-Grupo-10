@@ -62,25 +62,32 @@ class SpaceBase(Thread):
         print(f'{self.name}: Construindo foguete {rocket}')
         globals.release_print()
 
-    def refuel_oil(self):  # * Só aguardo se tenho espaço e se estiver disponível
-        if self.fuel < self.constraints[1]:  # oil não cheio
-            print(f'\n67\n')
+    def refuel_oil(self):
+        # Têm espaço para uma carga de oil?
+        if self.fuel <= self.constraints[1] - globals.oil_units:
+            # TODO, Será que fica mais eficiente?, Se tiver mais a disposição, pegue mais!
             # Existe oil disponível? Se não, tenho trabalho a fazer
             if globals.oil_avaliable.acquire(blocking=False):
                 # Existe oil disponível! Aguarda para receber
                 with globals.pipeline_units:
+                    # * Decrementa em oil_units self.unities
                     globals.get_mines_ref()[
                         'oil_earth'].unities -= globals.oil_units
+                    globals.oil_loads - 1  # * Decrementa em 1 globals.oil_loads
                 self.fuel += globals.oil_units
 
     def refuel_uranium(self):
-        if self.uranium < self.constraints[0]:  # urânio não cheio
+        # Têm espaço para uma carga de urânio?
+        if self.uranium < self.constraints[0] - globals.uranium_units:
+            # TODO, Será que fica mais eficiente?, Se tiver mais a disposição, pegue mais!
             # Existe urânio disponível? Se não, tenho trabalho a fazer
             if globals.uranium_avaliable.acquire(blocking=False):
                 # Existe urânio disponível! Aguarda para receber
                 with globals.store_house_units:
+                    # * Decrementa em uranium_units self.unities
                     globals.get_mines_ref()[
                         'uranium_earth'].unities -= globals.uranium_units
+                    globals.uranium_loads - 1  # * Decrementa em 1 globals.uranium_loads
                 self.uranium += globals.uranium_units
 
     def can_i_build_the_rocket(self, choiced):
