@@ -96,7 +96,7 @@ class SpaceBase(Thread):
                     return False
                 elif choiced == 'FALCON' and self.fuel < 100:
                     return False
-                #elif choiced == 'LION' and self.fuel < 
+                # elif choiced == 'LION' and self.fuel <
 
             case 'CANAVERAL CAPE':
                 if choiced == 'DRAGON' and self.fuel < 100:
@@ -125,22 +125,23 @@ class SpaceBase(Thread):
                 return  # finaliza a thread
 
             # Se MOON, verificar se precisa de recurso
-            if (self.name == 'MOON'and self.uranium <= 75):
+            if (self.name == 'MOON' and self.uranium <= 75):
 
                 if globals.alredy_asked == False:
                     globals.acquire_print()
                     print('Lua solicita lançamento de foguete LION')
                     globals.release_print()
-                    globals.alredy_asked = True # Seta true para não pedir foguetes caso já tenha pedido
+                    globals.alredy_asked = True  # Seta true para não pedir foguetes caso já tenha pedido
                     globals.moon_ask_lion_launch.release()  # Lua solicita recurso
-                
+
                 # TODO usar lock_lion_launch em um # if (lion_lock_launch.locked) #  para determinar se lua precisa de notify do foguete
-                globals.lock_lion_launch.acquire() # impede deadlock na lua e é condição para foguete dar notify para lua
+                # impede deadlock na lua e é condição para foguete dar notify para lua
+                globals.lock_lion_launch.acquire()
                 # Se não tem foguetes para lançar e recursos para construir mais, aguarda recursos chegarem
                 if (len(self.rockets) == 0 and self.uranium < 35 and globals.alredy_asked == True):
                     globals.moon_wait.wait()
-                     # TODO Foguete deve realizar # globals.alredy_asked == False # após chega na lua
-                
+                    # TODO Foguete deve realizar # globals.alredy_asked == False # após chega na lua
+
                 globals.lock_lion_launch.release()
 
             # Se !MOON,coleta recurso das minas

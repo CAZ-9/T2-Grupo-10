@@ -28,11 +28,21 @@ class StoreHouse(Thread):
             if(self.unities < self.constraint):
                 self.unities += 15
                 self.print_store_house()
-                # Faz a divisão inteira, para saber quantos poderão abastecer
-                n = 15//globals.uraniun_units
-                globals.uranium_avaliable.release(n)
 
+                # Libera para as bases receberem recurso apenas quando o recurso está disponível
+                globals.delivery_control(  # TODO: Testar delivery_control()
+                    self.unities, globals.uranium_units, globals.uranium_loads, globals.available_uranium)
         sleep(0.001)
+
+        # TODO: apagar pós teste de delivery_control()
+        # * # Faz a divisão inteira, "x" uranium_units
+        # * cargas_atuais = self.unities // uranium_units
+        # * # Tenho um número de cargas igual ou maior que antes?
+        # * if cargas_atuais >= globals.uranium_loads:
+        # *     n = cargas_atuais - globals.uranium_loads   # Diferença entre as cargas
+        # *     globals.uranium_loads += n                  # incremento minhas cargas
+        # *     #! É nescessário decrementar esse valor a cada x_loads removidos
+        # *     globals.available_uranium.release(n)        # Tenho n cargas disponíveis!
 
     def run(self):
         globals.acquire_print()

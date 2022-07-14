@@ -28,10 +28,10 @@ class Pipeline(Thread):
             if(self.unities < self.constraint):
                 self.unities += 17
                 self.print_pipeline()
-                # Faz a divisão inteira, para saber quantos poderão abastecer
-                n = 17//globals.oil.units  # ! a cada 5 carregamentos +2 deverão acontecer
-                globals.oil_avaliable.release(n)  # ! Espero um value error
 
+                # Libera para as bases receberem recurso apenas quando o recurso está disponível
+                globals.delivery_control(
+                    self.unities, globals.oil_units, globals.oil_loads, globals.available_oil)
         sleep(0.001)
 
     def run(self):

@@ -18,10 +18,11 @@ mines = {}
 simulation_time = None
 
 # Sincronização de pedidos da lua
-moon_ask_lion_launch = Semaphore(0) # Lua da release para solicitar foguete lion
-alredy_asked = False # Impede lua de pedir foguetes caso já tenha pedido
-lock_lion_launch = Lock() # Impede deadlock na lua
-moon_wait = Condition(lock_lion_launch) # Lua aguarda recursos
+# Lua da release para solicitar foguete lion
+moon_ask_lion_launch = Semaphore(0)
+alredy_asked = False  # Impede lua de pedir foguetes caso já tenha pedido
+lock_lion_launch = Lock()  # Impede deadlock na lua
+moon_wait = Condition(lock_lion_launch)  # Lua aguarda recursos
 
 # * Sincronização para as viagens
 # Garante que apenas 2 foguetes estejam em rota para Marte
@@ -44,28 +45,35 @@ voyage_europa = Semaphore(2)
 # Se lock estiver travado rota para o polo sul
 europa_north_pole = Lock()
 
+#! Variar para testar desempenho:
 oil_units = 5       # Valor base para receber oil
-uranium_units = 5   # Valor base para receber urânio
+uranium_units = 35  # Valor base de urânio para 1 foguete
+
+# Deveria estar no construtor de cada mina:
+#! Devem ser atualizados quando o recurso for decrementado da base
+uranium_loads = 0   # Variável que diz para a mina quanto urânio tinha
+oil_loads = 0       # Variável que diz para a mina quanto oil tinha
 
 # * Sincronização para abastecimento das bases:
 
 # Protege a região critica Pipeline.unities:
 pipeline_units = Lock()
 # Quantas unidades de óleo estão disponíveis?
-oil_avaliable = Semaphore(0)
-# Quantas unidades de urânio estão disponíveis?
-uranium_avaliable = Semaphore(0)
+available_oil = Semaphore(0)
 # Faz dois consumidores não acessarem a região crítica
-pipeline_consumidor = Lock()
+pipeline_consumidor = Lock()  # TODO verificar se usa em bases se não, REMOVER
 # Condition para consumir oil
+# TODO verificar se usa em bases se não, REMOVER
 pipeline_itens = Condition(pipeline_units)
-
 
 # Protege a região critica StoreHouse.unities:
 store_house_units = Lock()
+# Quantas unidades de urânio estão disponíveis?
+available_uranium = Semaphore(0)
 # Faz dois consumidores não acessarem a região crítica:
-store_house_consumidor = Lock()
+store_house_consumidor = Lock()  # TODO verificar se usa em bases se não, REMOVER
 # Condition para consumir
+# TODO verificar se usa em bases se não, REMOVER
 store_house_itens = Condition(store_house_units)
 
 
@@ -127,3 +135,20 @@ def set_simulation_time(time):
 def get_simulation_time():
     global simulation_time
     return simulation_time
+
+
+# * Funções para as minas:
+
+def delivery_control(unities: int('Unidades totais'),
+                     units_ready: ('Variável para armazenar int de n unidades prontas'),
+                     global_material_loads: ('Variável global para armazenar int de cargas de material'),
+                     semaphore: ('Semáforo global para controlar')):
+    # Faz a divisão inteira, possuí "x" units_ready
+    current_loads = unities // units_ready
+    # Tenho um número de cargas igual ou maior que antes?
+    if current_loads >= global_material_loads:
+        n = current_loads - global_material_loads   # Diferença entre as cargas
+        global_material_loads += n                  # incremento minhas cargas
+        #! É nescessário decrementar esse valor a cada x_loads removidos
+        # Tenho n cargas disponíveis!
+        semaphore.release(n)
