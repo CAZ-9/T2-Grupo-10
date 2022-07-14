@@ -67,28 +67,39 @@ class SpaceBase(Thread):
         if self.fuel <= self.constraints[1] - globals.oil_units:
             # TODO, Será que fica mais eficiente?, Se tiver mais a disposição, pegue mais!
             # Existe oil disponível? Se não, tenho trabalho a fazer
-            if globals.oil_avaliable.acquire(blocking=False):
+            #!if globals.available_oil.acquire(blocking=False):
+            # TypeError: 'blocking' is an invalid keyword argument for acquire()
+            if globals.available_oil.acquire():
                 # Existe oil disponível! Aguarda para receber
                 with globals.pipeline_units:
                     # * Decrementa em oil_units self.unities
-                    globals.get_mines_ref()[
-                        'oil_earth'].unities -= globals.oil_units
+                    #! globals.get_mines_ref()['oil_earth'].unities -= globals.oil_units
+                    #! KeyError: 'oil_earth'
+                    globals.get_mines_ref().get('oil_earth').unities -= globals.oil_units
+                    # globals.get_mines_ref()[
+                    #    'oil_earth'].unities -= globals.oil_units
                     globals.oil_loads - 1  # * Decrementa em 1 globals.oil_loads
                 self.fuel += globals.oil_units
+                print(f'{self.name} ABASTECEU: {self.fuel} ⛽')
 
     def refuel_uranium(self):
         # Têm espaço para uma carga de urânio?
         if self.uranium < self.constraints[0] - globals.uranium_units:
             # TODO, Será que fica mais eficiente?, Se tiver mais a disposição, pegue mais!
             # Existe urânio disponível? Se não, tenho trabalho a fazer
-            if globals.uranium_avaliable.acquire(blocking=False):
+            #! if globals.available_uranium.acquire(blocking=False):
+            # TypeError: 'blocking' is an invalid keyword argument for acquire()
+            if globals.available_uranium.acquire():
                 # Existe urânio disponível! Aguarda para receber
                 with globals.store_house_units:
                     # * Decrementa em uranium_units self.unities
-                    globals.get_mines_ref()[
-                        'uranium_earth'].unities -= globals.uranium_units
+                    '''globals.get_mines_ref()[
+                        'uranium_earth'].unities -= globals.uranium_units'''
+                    globals.get_mines_ref().get(
+                        'uranium_earth').unities -= globals.uranium_units
                     globals.uranium_loads - 1  # * Decrementa em 1 globals.uranium_loads
                 self.uranium += globals.uranium_units
+                print(f'{self.name} - ABASTECEU: {self.uranium} ☢')
 
     def can_i_build_the_rocket(self, choiced):
         match self.name:
@@ -162,7 +173,8 @@ class SpaceBase(Thread):
 
                 # TODO Construir lion se MOON precisa de recursos
                 # TODO mudar condicional para fuel 100
-                if (globals.moon_ask_lion_launch.acquire(blocking=False) and self.uranium >= 75 and self.fuel >= 235):
+                #! if (globals.moon_ask_lion_launch.acquire(blocking=False) and self.uranium >= 75 and self.fuel >= 235):
+                if (globals.moon_ask_lion_launch.acquire() and self.uranium >= 75 and self.fuel >= 235):
                     self.build_rocket('LION')
                     # Carregar foguete lion com fuel e uranium
                     self.rockets[len(self.rockets)-1].fuel_cargo += 120

@@ -46,7 +46,7 @@ voyage_europa = Semaphore(2)
 europa_north_pole = Lock()
 
 #! Variar para testar desempenho:
-oil_units = 5       # Valor base para receber oil
+oil_units = 17       # Valor base para receber oil
 uranium_units = 35  # Valor base de urânio para 1 foguete
 
 # Deveria estar no construtor de cada mina:
@@ -156,4 +156,7 @@ def delivery_control(unities, units_ready, global_material_loads, semaphore):
         global_material_loads += n                  # incremento minhas cargas
         #! É nescessário decrementar esse valor a cada x_loads removidos
         # Tenho n cargas disponíveis!
-        semaphore.release(n)
+        #!semaphore.release(n)
+        # TypeError: SemLock.release() takes no arguments (1 given)
+        for i in range(0, n):
+            semaphore.release()
