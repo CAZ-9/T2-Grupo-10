@@ -178,14 +178,16 @@ class SpaceBase(Thread):
             
 
     def run(self):
-        globals.acquire_print()
-        self.print_space_base_info()
-        globals.release_print()
+        
 
         self.rockets = []
         random_rockets = ['DRAGON', 'FALCON']
 
         while(True):
+            globals.acquire_print()
+            self.print_space_base_info()
+            globals.release_print()
+
             if (globals.get_release_system()):
                 return  # finaliza a thread
 
@@ -238,14 +240,18 @@ class SpaceBase(Thread):
             if (len(self.rockets) > 0):
                 # checa se tem foguete lion armazenado
                 launch_lion = False
-                for x in range(len(self.rockets),0):
+                for x in range(len(self.rockets)):
                     if self.rockets[x] == 'LION':
                         launch_lion = True
                         self.rockets.pop(x)
                         break
                 
                 if (launch_lion == True):
-                    choiced_to_launch = self.rockets[len(self.rockets)-1]
+                    # TODO chamar função de laçamento lion
+                    globals.acquire_print()
+                    print(f'{self.name}: laçamento de foguete LION') 
+                    globals.release_print()
+                    launch_lion = False
                 else:
                     choiced_to_launch = choice(self.rockets)
 
