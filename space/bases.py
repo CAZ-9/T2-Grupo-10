@@ -21,10 +21,10 @@ class SpaceBase(Thread):
     def print_space_base_info(self):
         print(f"🔭 - [{self.name}] → 🪨  {self.uranium}/{self.constraints[0]} URANIUM  ⛽ {self.fuel}/{self.constraints[1]}  🚀 {self.rockets}/{self.constraints[2]}")
 
-    def build_rocket(self, rocket_name):
+    '''def build_rocket(self, rocket_name):
         match rocket_name:
             case 'DRAGON':
-                if self.uranium > 35 and self.fuel > 50:
+                #if self.uranium > 35 and self.fuel > 50:
                     self.uranium = self.uranium - 35
                     if self.name == 'ALCANTARA':
                         self.fuel = self.fuel - 70
@@ -60,7 +60,7 @@ class SpaceBase(Thread):
         self.rockets.append(rocket)
         globals.acquire_print()
         print(f'{self.name}: Construindo foguete {rocket}')
-        globals.release_print()
+        globals.release_print()'''  # TODO Depois eu vejo oq vou fazer com essa merda
 
     def refuel_oil(self):
         # Têm espaço para uma carga de oil?
@@ -80,7 +80,9 @@ class SpaceBase(Thread):
                     #    'oil_earth'].unities -= globals.oil_units
                     globals.oil_loads - 1  # * Decrementa em 1 globals.oil_loads
                 self.fuel += globals.oil_units
+                globals.acquire_print()
                 print(f'{self.name} ABASTECEU: {self.fuel} ⛽')
+                globals.release_print()
 
     def refuel_uranium(self):
         # Têm espaço para uma carga de urânio?
@@ -99,36 +101,81 @@ class SpaceBase(Thread):
                         'uranium_earth').unities -= globals.uranium_units
                     globals.uranium_loads - 1  # * Decrementa em 1 globals.uranium_loads
                 self.uranium += globals.uranium_units
+                globals.acquire_print()
                 print(f'{self.name} - ABASTECEU: {self.uranium} ☢')
+                globals.release_print()
 
-    def can_i_build_the_rocket(self, choiced):
-        match self.name:
-            case 'MOON':
-                if choiced == 'DRAGON' and self.fuel < 50:
-                    return
-                elif choiced == 'FALCON' and self.fuel < 90:
-                    return
+    def try_to_build_rocket(self, choiced_rocket):
+       
+            if self.name == 'MOON':
+                if (choiced_rocket == 'DRAGON' and self.fuel >= 50) or (choiced_rocket == 'FALCON' and self.fuel < 90):
+                     # Constrói foguete
+                    rocket = Rocket(choiced_rocket)
+                    
+                    if choiced_rocket == 'DRAGON':
+                        self.fuel -= 50
+                    else:
+                        self.fuel -= 90
+                    self.uranium -= 35
+                
+                    # Adiciona foguete ao armazenamento da base
+                    self.rockets.append(rocket)
+                    globals.acquire_print()
+                    print(f'{self.name}: Construindo foguete {rocket}')
+                    globals.release_print()                    
+          
+            elif self.name == 'ALCANTARA':
+                if (choiced_rocket == 'DRAGON' and self.fuel < 70) or (choiced_rocket == 'FALCON' and self.fuel < 100) or (choiced_rocket == 'LION'):
+                     # Constrói foguete
+                    rocket = Rocket(choiced_rocket)
+                    
+                    if choiced_rocket == 'DRAGON':
+                        self.fuel -= 70
+                        self.uranium -= 35
+                    
+                    elif choiced_rocket == 'FALCON':
+                        self.fuel -= 100
+                        self.uranium -= 35
+                    
+                    else:
+                        refuel = 30000 - globals.get_bases_ref()['MOON'].fuel
+                        if refuel >= 120:
+                            refuel = 120
+                        self.uranium -= 75
+                        rocket.uranium_cargo += 75
+                        self.fuel -= refuel
+                        rocket.fuel_cargo += refuel
 
-            case 'ALCANTARA':
-                if choiced == 'DRAGON' and self.fuel < 70:
-                    return False
-                elif choiced == 'FALCON' and self.fuel < 100:
-                    return False
-                # elif choiced == 'LION' and self.fuel <
+                    # Adiciona foguete ao armazenamento da base
+                    self.rockets.append(rocket)
+                    globals.acquire_print()
+                    print(f'{self.name}: Construindo foguete {rocket}')
+                    globals.release_print()                    
+            
+            else:
+                if (choiced_rocket == 'DRAGON' and self.fuel < 100) or (choiced_rocket == 'FALCON' and self.fuel < 120) or (choiced_rocket == 'LION'):
+                     # Constrói foguete
+                    rocket = Rocket(choiced_rocket)
 
-            case 'CANAVERAL CAPE':
-                if choiced == 'DRAGON' and self.fuel < 100:
-                    return False
-                elif choiced == 'FALCON' and self.fuel < 120:
-                    return False
+                    if choiced_rocket == 'DRAGON':
+                        self.fuel -= 100
+                        self.uranium -= 35
+                    
+                    elif choiced_rocket == 'FALCON':
+                        self.fuel -= 120
+                        self.uranium -= 35
+                    
+                    else:
+                        self.fuel -= 235
+                        self.uranium -= 75
 
-            case 'MOSCOW':
-                if choiced == 'DRAGON' and self.fuel < 100:
-                    return False
-                elif choiced == 'FALCON' and self.fuel < 120:
-                    return False
-
-        return TRUE
+                   
+                    # Adiciona foguete ao armazenamento da base
+                    self.rockets.append(rocket)
+                    globals.acquire_print()
+                    print(f'{self.name}: Construindo foguete {rocket}')
+                    globals.release_print()             
+            
 
     def run(self):
         globals.acquire_print()
@@ -158,7 +205,7 @@ class SpaceBase(Thread):
                 # Se não tem foguetes para lançar e recursos para construir mais, aguarda recursos chegarem
                 if (len(self.rockets) == 0 and self.uranium < 35 and globals.alredy_asked == True):
                     globals.moon_wait.wait()
-                    # TODO Foguete deve realizar # globals.alredy_asked == False # após chega na lua
+                    # TODO Foguete deve realizar # globals.alredy_asked == False # após chegar na lua
 
                 globals.lock_lion_launch.release()
 
@@ -167,15 +214,13 @@ class SpaceBase(Thread):
                 self.refuel_oil()
                 self.refuel_uranium()
 
-            # TODO lógica de contrução de foguetes incompleta
             # Constrói foguete se base não cheia
             if len(self.rockets) < self.constraints[2]:
 
                 # TODO Construir lion se MOON precisa de recursos
-                # TODO mudar condicional para fuel 100
                 #! if (globals.moon_ask_lion_launch.acquire(blocking=False) and self.uranium >= 75 and self.fuel >= 235):
-                if (globals.moon_ask_lion_launch.acquire() and self.uranium >= 75 and self.fuel >= 235):
-                    self.build_rocket('LION')
+                if (globals.moon_ask_lion_launch.acquire(Blocking=False) and self.uranium >= 75 and self.fuel >= 235):
+                    self.try_to_build_rocket('LION')
                     # Carregar foguete lion com fuel e uranium
                     self.rockets[len(self.rockets)-1].fuel_cargo += 120
                     self.fuel -= 120
@@ -186,12 +231,20 @@ class SpaceBase(Thread):
                 else:
                     if (self.uranium >= 35):
                         choiced_rocket = choice(random_rockets)
-                        if (self.can_i_build_the_rocket(choiced_rocket)):
-                            self.build_rocket(choiced_rocket)
-
+                        self.try_to_build_rocket(choiced_rocket)
+            
+            # TODO lógica de lançaento de foguetes incompleta
             # decidir qual foguete lançar
             if (len(self.rockets) > 0):
-                if (self.rockets[len(self.rockets)-1].name == 'LION'):
+                # checa se tem foguete lion armazenado
+                launch_lion = False
+                for x in range(len(self.rockets),0):
+                    if self.rockets[x] == 'LION':
+                        launch_lion = True
+                        self.rockets.pop(x)
+                        break
+                
+                if (launch_lion == True):
                     choiced_to_launch = self.rockets[len(self.rockets)-1]
                 else:
                     choiced_to_launch = choice(self.rockets)
