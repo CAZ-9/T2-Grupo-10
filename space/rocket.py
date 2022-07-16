@@ -85,7 +85,7 @@ class Rocket:
             lua.uranium += self.uranium_cargo # Recarrega urânio da lua
         
         globals.acquire_print()
-        print(f"🚀 - [LION] - Arrived in MOON base - refueling ⛽ {self.fuel_cargo} ☢🪨{ self.uranium_cargo}")
+        print(f"🚀🦁 - [LION] - Arrived in MOON base - refueling ⛽ {self.fuel_cargo} ☢🪨{ self.uranium_cargo}")
         globals.release_print()
         
         globals.lock_lion_launch.acquire()

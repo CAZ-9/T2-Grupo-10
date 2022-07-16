@@ -189,7 +189,7 @@ class SpaceBase(Thread):
 
                 if globals.alredy_asked == False:
                     globals.acquire_print()
-                    print(f'🔭 - [MOON] → request LION rocket launch ')
+                    print(f'🔭 - [MOON] → request LION 🦁 rocket launch')
                     globals.release_print()
                     globals.alredy_asked = True  # Seta true para não pedir foguetes caso já tenha pedido
                     globals.moon_ask_lion_launch.release()  # Lua solicita recurso
@@ -212,8 +212,8 @@ class SpaceBase(Thread):
             # Constrói foguete se base não cheia e tem recursos para construir
             if len(self.rockets) < self.constraints[2]:
 
-                # TODO Construir lion se MOON precisa de recursos
-                if (globals.moon_ask_lion_launch.acquire(blocking=False) and self.uranium >= 75 and self.fuel >= 235):
+                # Construir lion se MOON precisa de recursos
+                if (self.name != 'MOON' and self.uranium >= 75 and self.fuel >= 235 and globals.moon_ask_lion_launch.acquire(blocking=False)):
                     self.try_to_build_rocket('LION')
 
                 # Construir DRAGON ou FALCON
