@@ -20,9 +20,9 @@ class SimulationTime(Thread):
         return self.current_time
 
     def run(self):
-        
+
         while(True):
-            if  (globals.get_release_system()):
+            if (globals.get_release_system()):
                 break
             print(f"{self.current_time} year(s) have passed...")
             self.current_time += 1

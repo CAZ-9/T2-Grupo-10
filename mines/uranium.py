@@ -21,7 +21,7 @@ class StoreHouse(Thread):
 
     def print_store_house(self):
         print(
-            f"🔨 - [{self.location}] - {self.unities} uranium unities are produced.")
+            f"🔨 - [{self.location}] → {self.unities} uranium unities are produced ☢ .")
 
     def produce(self):
         with globals.store_house_units:  # Acesso a store_house_units

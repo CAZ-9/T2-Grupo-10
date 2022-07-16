@@ -19,7 +19,7 @@ class SpaceBase(Thread):
         self.constraints = [uranium, fuel, rockets]
 
     def print_space_base_info(self):
-        print(f"🔭 - [{self.name}] → 🪨  {self.uranium}/{self.constraints[0]} URANIUM  ⛽ {self.fuel}/{self.constraints[1]}  🚀 {len(self.rockets)}/{self.constraints[2]}")
+        print(f"🔭 - [{self.name}] - ☢  {self.uranium}/{self.constraints[0]} URANIUM  ⛽ {self.fuel}/{self.constraints[1]}  🚀 {len(self.rockets)}/{self.constraints[2]}")
 
     '''def build_rocket(self, rocket_name):
         match rocket_name:
@@ -67,21 +67,15 @@ class SpaceBase(Thread):
         if self.fuel <= self.constraints[1] - globals.oil_units:
             # TODO, Será que fica mais eficiente?, Se tiver mais a disposição, pegue mais!
             # Existe oil disponível? Se não, tenho trabalho a fazer
-            #!if globals.available_oil.acquire(blocking=False):
-            # TypeError: 'blocking' is an invalid keyword argument for acquire()
             if globals.available_oil.acquire(blocking=False):
                 # Existe oil disponível! Aguarda para receber
                 with globals.pipeline_units:
                     # * Decrementa em oil_units self.unities
-                    #! globals.get_mines_ref()['oil_earth'].unities -= globals.oil_units
-                    #! KeyError: 'oil_earth'
                     globals.get_mines_ref().get('oil_earth').unities -= globals.oil_units
-                    # globals.get_mines_ref()[
-                    #    'oil_earth'].unities -= globals.oil_units
                     globals.oil_loads - 1  # * Decrementa em 1 globals.oil_loads
                 self.fuel += globals.oil_units
                 globals.acquire_print()
-                print(f'{self.name} refuel: {self.fuel} ⛽')
+                print(f'🔭 - [{self.name}] → refuel: {self.fuel} ⛽')
                 globals.release_print()
 
     def refuel_uranium(self):
@@ -89,20 +83,16 @@ class SpaceBase(Thread):
         if self.uranium < self.constraints[0] - globals.uranium_units:
             # TODO, Será que fica mais eficiente?, Se tiver mais a disposição, pegue mais!
             # Existe urânio disponível? Se não, tenho trabalho a fazer
-            #! if globals.available_uranium.acquire(blocking=False):
-            # TypeError: 'blocking' is an invalid keyword argument for acquire()
             if globals.available_uranium.acquire(blocking=False):
                 # Existe urânio disponível! Aguarda para receber
                 with globals.store_house_units:
                     # * Decrementa em uranium_units self.unities
-                    '''globals.get_mines_ref()[
-                        'uranium_earth'].unities -= globals.uranium_units'''
                     globals.get_mines_ref().get(
                         'uranium_earth').unities -= globals.uranium_units
                     globals.uranium_loads - 1  # * Decrementa em 1 globals.uranium_loads
                 self.uranium += globals.uranium_units
                 globals.acquire_print()
-                print(f'{self.name} - refuel: {self.uranium} ☢')
+                print(f'🔭 - [{self.name}] → refuel: {self.uranium} ☢')
                 globals.release_print()
 
     def try_to_build_rocket(self, choiced_rocket):
@@ -121,7 +111,7 @@ class SpaceBase(Thread):
                 # Adiciona foguete ao armazenamento da base
                 self.rockets.append(rocket)
                 globals.acquire_print()
-                print(f'{self.name}: Building {choiced_rocket} rocket')
+                print(f'🔭 - [{self.name}]: Building {choiced_rocket} rocket')
                 globals.release_print()
 
         elif self.name == 'ALCANTARA':
@@ -198,7 +188,7 @@ class SpaceBase(Thread):
 
                 if globals.alredy_asked == False:
                     globals.acquire_print()
-                    print('MOON ask LION rocket launch ')
+                    print(f'🔭 - [MOON] → request LION rocket launch ')
                     globals.release_print()
                     globals.alredy_asked = True  # Seta true para não pedir foguetes caso já tenha pedido
                     globals.moon_ask_lion_launch.release()  # Lua solicita recurso
@@ -245,7 +235,7 @@ class SpaceBase(Thread):
                 if (launch_lion == True):
                     # TODO chamar função de laçamento lion
                     globals.acquire_print()
-                    print(f'{self.name}: laçamento de foguete LION')
+                    print(f'🔭 - [{self.name}] → launching LION rocket')
                     globals.release_print()
                     launch_lion = False
                     # TODO Cria thread do foguete
@@ -255,7 +245,7 @@ class SpaceBase(Thread):
                     self.rockets.remove(choiced_to_launch)
                     globals.acquire_print()
                     print(
-                        f'{self.name}: laçamento de foguete {choiced_to_launch.name}')
+                        f'🔭 - [{self.name}] → launching {choiced_to_launch.name} rocket')
                     globals.release_print()
                     # TODO Chamar função de definição de destino
                     # TODO Criar thread do foguete em bases

@@ -20,7 +20,7 @@ class Pipeline(Thread):
 
     def print_pipeline(self):
         print(
-            f"🔨 - [{self.location}] - {self.unities} oil unities are produced."
+            f"🔨 - [{self.location}] → {self.unities} oil unities are produced ⛽ ."
         )
 
     def produce(self):
