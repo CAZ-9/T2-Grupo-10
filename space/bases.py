@@ -1,6 +1,6 @@
 from pickle import FALSE, TRUE
 import globals
-from threading import Thread, Lock
+from threading import Thread, Lock, Semaphore
 from space.rocket import Rocket
 from random import choice
 
@@ -69,7 +69,7 @@ class SpaceBase(Thread):
             # Existe oil disponível? Se não, tenho trabalho a fazer
             #!if globals.available_oil.acquire(blocking=False):
             # TypeError: 'blocking' is an invalid keyword argument for acquire()
-            if globals.available_oil.acquire():
+            if globals.available_oil.acquire(blocking=False):
                 # Existe oil disponível! Aguarda para receber
                 with globals.pipeline_units:
                     # * Decrementa em oil_units self.unities
@@ -91,7 +91,7 @@ class SpaceBase(Thread):
             # Existe urânio disponível? Se não, tenho trabalho a fazer
             #! if globals.available_uranium.acquire(blocking=False):
             # TypeError: 'blocking' is an invalid keyword argument for acquire()
-            if globals.available_uranium.acquire():
+            if globals.available_uranium.acquire(blocking=False):
                 # Existe urânio disponível! Aguarda para receber
                 with globals.store_house_units:
                     # * Decrementa em uranium_units self.unities
@@ -106,81 +106,79 @@ class SpaceBase(Thread):
                 globals.release_print()
 
     def try_to_build_rocket(self, choiced_rocket):
-       
-            if self.name == 'MOON':
-                if (choiced_rocket == 'DRAGON' and self.fuel >= 50) or (choiced_rocket == 'FALCON' and self.fuel >= 90):
-                    # Constrói foguete
-                    rocket = Rocket(choiced_rocket)
-                    
-                    if choiced_rocket == 'DRAGON':
-                        self.fuel -= 50
-                    else:
-                        self.fuel -= 90
+
+        if self.name == 'MOON':
+            if (choiced_rocket == 'DRAGON' and self.fuel >= 50) or (choiced_rocket == 'FALCON' and self.fuel >= 90):
+                # Constrói foguete
+                rocket = Rocket(choiced_rocket)
+
+                if choiced_rocket == 'DRAGON':
+                    self.fuel -= 50
+                else:
+                    self.fuel -= 90
+                self.uranium -= 35
+
+                # Adiciona foguete ao armazenamento da base
+                self.rockets.append(rocket)
+                globals.acquire_print()
+                print(f'{self.name}: Building {rocket} rocket')
+                globals.release_print()
+
+        elif self.name == 'ALCANTARA':
+            if (choiced_rocket == 'DRAGON' and self.fuel >= 70) or (choiced_rocket == 'FALCON' and self.fuel >= 100) or (choiced_rocket == 'LION'):
+                # Constrói foguete
+                rocket = Rocket(choiced_rocket)
+
+                if choiced_rocket == 'DRAGON':
+                    self.fuel -= 70
                     self.uranium -= 35
-                
-                    # Adiciona foguete ao armazenamento da base
-                    self.rockets.append(rocket)
-                    globals.acquire_print()
-                    print(f'{self.name}: Building {rocket} rocket')
-                    globals.release_print()                    
-          
-            elif self.name == 'ALCANTARA':
-                if (choiced_rocket == 'DRAGON' and self.fuel >= 70) or (choiced_rocket == 'FALCON' and self.fuel >= 100) or (choiced_rocket == 'LION'):
-                     # Constrói foguete
-                    rocket = Rocket(choiced_rocket)
-                    
-                    if choiced_rocket == 'DRAGON':
-                        self.fuel -= 70
-                        self.uranium -= 35
-                    
-                    elif choiced_rocket == 'FALCON':
-                        self.fuel -= 100
-                        self.uranium -= 35
-                    
-                    else:
-                        refuel = 30000 - globals.get_bases_ref()['MOON'].fuel
-                        if refuel >= 120:
-                            refuel = 120
-                        self.uranium -= 75
-                        rocket.uranium_cargo += 75
-                        self.fuel -= refuel
-                        rocket.fuel_cargo += refuel
 
-                    # Adiciona foguete ao armazenamento da base
-                    self.rockets.append(rocket)
-                    globals.acquire_print()
-                    print(f'{self.name}: Building {rocket} rocket')
-                    globals.release_print()                    
-            
-            else:
-                if (choiced_rocket == 'DRAGON' and self.fuel >= 100) or (choiced_rocket == 'FALCON' and self.fuel >= 120) or (choiced_rocket == 'LION'):
-                    # Constrói foguete
-                    rocket = Rocket(choiced_rocket)
+                elif choiced_rocket == 'FALCON':
+                    self.fuel -= 100
+                    self.uranium -= 35
 
-                    if choiced_rocket == 'DRAGON':
-                        self.fuel -= 100
-                        self.uranium -= 35
-                    
-                    elif choiced_rocket == 'FALCON':
-                        self.fuel -= 120
-                        self.uranium -= 35
-                    
-                    else:
-                        refuel = 30000 - globals.get_bases_ref()['MOON'].fuel
-                        if refuel >= 120:
-                            refuel = 120
-                        self.uranium -= 75
-                        rocket.uranium_cargo += 75
-                        self.fuel -= refuel
-                        rocket.fuel_cargo += refuel
+                else:
+                    refuel = 30000 - globals.get_bases_ref()['MOON'].fuel
+                    if refuel >= 120:
+                        refuel = 120
+                    self.uranium -= 75
+                    rocket.uranium_cargo += 75
+                    self.fuel -= refuel
+                    rocket.fuel_cargo += refuel
 
-                   
-                    # Adiciona foguete ao armazenamento da base
-                    self.rockets.append(rocket)
-                    globals.acquire_print()
-                    print(f'{self.name}: Building {rocket} rocket')
-                    globals.release_print()             
-            
+                # Adiciona foguete ao armazenamento da base
+                self.rockets.append(rocket)
+                globals.acquire_print()
+                print(f'{self.name}: Building {rocket} rocket')
+                globals.release_print()
+
+        else:
+            if (choiced_rocket == 'DRAGON' and self.fuel >= 100) or (choiced_rocket == 'FALCON' and self.fuel >= 120) or (choiced_rocket == 'LION'):
+                # Constrói foguete
+                rocket = Rocket(choiced_rocket)
+
+                if choiced_rocket == 'DRAGON':
+                    self.fuel -= 100
+                    self.uranium -= 35
+
+                elif choiced_rocket == 'FALCON':
+                    self.fuel -= 120
+                    self.uranium -= 35
+
+                else:
+                    refuel = 30000 - globals.get_bases_ref()['MOON'].fuel
+                    if refuel >= 120:
+                        refuel = 120
+                    self.uranium -= 75
+                    rocket.uranium_cargo += 75
+                    self.fuel -= refuel
+                    rocket.fuel_cargo += refuel
+
+                # Adiciona foguete ao armazenamento da base
+                self.rockets.append(rocket)
+                globals.acquire_print()
+                print(f'{self.name}: Building {rocket} rocket')
+                globals.release_print()
 
     def run(self):
 
@@ -226,14 +224,13 @@ class SpaceBase(Thread):
                 # TODO Construir lion se MOON precisa de recursos
                 if (globals.moon_ask_lion_launch.acquire(blocking=False) and self.uranium >= 75 and self.fuel >= 235):
                     self.try_to_build_rocket('LION')
-                    
 
                 # Construir DRAGON ou FALCON
-                #else:
+                # else:
                 if (self.uranium >= 35):
                     choiced_rocket = choice(random_rockets)
                     self.try_to_build_rocket(choiced_rocket)
-            
+
             # TODO lógica de lançaento de foguetes incompleta
             # decidir qual foguete lançar
             if (len(self.rockets) > 0):
@@ -244,34 +241,32 @@ class SpaceBase(Thread):
                         launch_lion = True
                         lion = self.rockets.pop(x)
                         break
-                
+
                 if (launch_lion == True):
                     # TODO chamar função de laçamento lion
                     globals.acquire_print()
-                    print(f'{self.name}: laçamento de foguete LION') 
+                    print(f'{self.name}: laçamento de foguete LION')
                     globals.release_print()
                     launch_lion = False
-                    # TODO Cria thread do foguete 
-                    
+                    # TODO Cria thread do foguete
+
                 else:
                     choiced_to_launch = choice(self.rockets)
                     self.rockets.remove(choiced_to_launch)
                     globals.acquire_print()
-                    print(f'{self.name}: laçamento de foguete {choiced_to_launch.name}') 
+                    print(
+                        f'{self.name}: laçamento de foguete {choiced_to_launch.name}')
                     globals.release_print()
-                    # TODO Chamar função de definição de destino 
+                    # TODO Chamar função de definição de destino
                     # TODO Criar thread do foguete em bases
                     # TODO Chamar função de lançamento
 
-                #destination = choiced_to_launch.planning_launch()  # qual planeta
+                # destination = choiced_to_launch.planning_launch()  # qual planeta
                 # rocket_thread = Thread(name=self.id)
                 # rocket_thread.start(target=self.launch)  # Inicializa a thread
 
                 # TODO: tentar lançar foguete chamando Rocket.launch
 
         globals.acquire_print()
-        print(f'Thread da base {self.name} finalizada') 
+        print(f'Thread da base {self.name} finalizada')
         globals.release_print()
-
-            
-        

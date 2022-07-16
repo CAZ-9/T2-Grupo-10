@@ -1,6 +1,6 @@
 from random import randrange, random
 from time import sleep
-from threading import Thread, current_thread
+from threading import Thread, current_thread, Semaphore
 import globals
 
 
