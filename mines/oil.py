@@ -19,25 +19,22 @@ class Pipeline(Thread):
         self.constraint = constraint
 
     def print_pipeline(self):
-        print(
-            f"🔨 - [{self.location}] → {self.unities} oil unities are produced ⛽ ."
-        )
+        print(f"🔨 - [{self.location}] → {self.unities} oil unities are produced ⛽ ")
 
     def produce(self):
+        
         with globals.pipeline_units:  # Acesso a pipeline_units
             if(self.unities < self.constraint):
                 self.unities += 17
                 self.print_pipeline()
+        globals.available_oil.release()
 
                 # Libera para as bases receberem recurso apenas quando o recurso está disponível
-                globals.delivery_control(
-                    self.unities, globals.oil_units, globals.oil_loads, globals.available_oil)
+                #globals.delivery_control(
+                #self.unities, globals.oil_units, globals.oil_loads, globals.available_oil)'''
         sleep(0.001)
 
     def run(self):
-        globals.acquire_print()
-        self.print_pipeline()
-        globals.release_print()
 
         while(True):
             if (globals.get_release_system()):

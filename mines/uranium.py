@@ -20,18 +20,18 @@ class StoreHouse(Thread):
         self.constraint = constraint
 
     def print_store_house(self):
-        print(
-            f"🔨 - [{self.location}] → {self.unities} uranium unities are produced ☢ .")
+        print(f"🔨 - [{self.location}] → {self.unities} uranium unities are produced ☢ .")
 
     def produce(self):
         with globals.store_house_units:  # Acesso a store_house_units
             if(self.unities < self.constraint):
                 self.unities += 15
                 self.print_store_house()
+        globals.available_uranium.release()
 
-                # Libera para as bases receberem recurso apenas quando o recurso está disponível
-                globals.delivery_control(  # TODO: Testar delivery_control()
-                    self.unities, globals.uranium_units, globals.uranium_loads, globals.available_uranium)
+                #   Libera para as bases receberem recurso apenas quando o recurso está disponível
+                #   globals.delivery_control(  # TODO: Testar delivery_control()
+                #   self.unities, globals.uranium_units, globals.uranium_loads, globals.available_uranium)'''
         sleep(0.001)
 
         # TODO: apagar pós teste de delivery_control()
@@ -45,9 +45,6 @@ class StoreHouse(Thread):
         # *     globals.available_uranium.release(n)        # Tenho n cargas disponíveis!
 
     def run(self):
-        globals.acquire_print()
-        self.print_store_house()
-        globals.release_print()
 
         while(True):
             if (globals.get_release_system()):
