@@ -121,7 +121,7 @@ class SpaceBase(Thread):
                 # Adiciona foguete ao armazenamento da base
                 self.rockets.append(rocket)
                 globals.acquire_print()
-                print(f'{self.name}: Building {rocket} rocket')
+                print(f'{self.name}: Building {choiced_rocket} rocket')
                 globals.release_print()
 
         elif self.name == 'ALCANTARA':
@@ -149,7 +149,7 @@ class SpaceBase(Thread):
                 # Adiciona foguete ao armazenamento da base
                 self.rockets.append(rocket)
                 globals.acquire_print()
-                print(f'{self.name}: Building {rocket} rocket')
+                print(f'{self.name}: Building {choiced_rocket} rocket')
                 globals.release_print()
 
         else:
@@ -177,7 +177,7 @@ class SpaceBase(Thread):
                 # Adiciona foguete ao armazenamento da base
                 self.rockets.append(rocket)
                 globals.acquire_print()
-                print(f'{self.name}: Building {rocket} rocket')
+                print(f'{self.name}: Building {choiced_rocket} rocket')
                 globals.release_print()
 
     def run(self):
@@ -198,7 +198,7 @@ class SpaceBase(Thread):
 
                 if globals.alredy_asked == False:
                     globals.acquire_print()
-                    print('Lua solicita lançamento de foguete LION')
+                    print('MOON ask LION rocket launch ')
                     globals.release_print()
                     globals.alredy_asked = True  # Seta true para não pedir foguetes caso já tenha pedido
                     globals.moon_ask_lion_launch.release()  # Lua solicita recurso
