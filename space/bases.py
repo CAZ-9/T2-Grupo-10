@@ -19,7 +19,7 @@ class SpaceBase(Thread):
         self.constraints = [uranium, fuel, rockets]
 
     def print_space_base_info(self):
-        print(f"🔭 - [{self.name}] - ☢  {self.uranium}/{self.constraints[0]} URANIUM  ⛽ {self.fuel}/{self.constraints[1]}  🚀 {len(self.rockets)}/{self.constraints[2]}")
+        print(f"🔭 - [{self.name}] - ☢ {self.uranium}/{self.constraints[0]} URANIUM  ⛽ {self.fuel}/{self.constraints[1]}  🚀 {len(self.rockets)}/{self.constraints[2]}")
 
     '''def build_rocket(self, rocket_name):
         match rocket_name:
@@ -101,12 +101,13 @@ class SpaceBase(Thread):
             if (choiced_rocket == 'DRAGON' and self.fuel >= 50) or (choiced_rocket == 'FALCON' and self.fuel >= 90):
                 # Constrói foguete
                 rocket = Rocket(choiced_rocket)
-
-                if choiced_rocket == 'DRAGON':
-                    self.fuel -= 50
-                else:
-                    self.fuel -= 90
-                self.uranium -= 35
+                with globals.moon_constraints: # Impede corrida na leitura e escrita dos recursos da lua
+                    if choiced_rocket == 'DRAGON':
+                        
+                        self.fuel -= 50
+                    else:
+                        self.fuel -= 90
+                    self.uranium -= 35
 
                 # Adiciona foguete ao armazenamento da base
                 self.rockets.append(rocket)
@@ -132,8 +133,8 @@ class SpaceBase(Thread):
                     if refuel >= 120:
                         refuel = 120
                     self.uranium -= 75
-                    rocket.uranium_cargo += 75
                     self.fuel -= refuel
+                    rocket.uranium_cargo += 75
                     rocket.fuel_cargo += refuel
 
                 # Adiciona foguete ao armazenamento da base
@@ -160,8 +161,8 @@ class SpaceBase(Thread):
                     if refuel >= 120:
                         refuel = 120
                     self.uranium -= 75
-                    rocket.uranium_cargo += 75
                     self.fuel -= refuel
+                    rocket.uranium_cargo += 75
                     rocket.fuel_cargo += refuel
 
                 # Adiciona foguete ao armazenamento da base
@@ -194,8 +195,7 @@ class SpaceBase(Thread):
                     globals.moon_ask_lion_launch.release()  # Lua solicita recurso
 
                 # TODO usar lock_lion_launch em um # if (lock_lion_launch.locked) #  para determinar se lua precisa de notify do foguete
-                # impede deadlock na lua e é condição para foguete dar notify para lua
-                globals.lock_lion_launch.acquire()
+                globals.lock_lion_launch.acquire() # impede deadlock na lua e é condição para foguete dar notify para lua
                 # Se não tem foguetes para lançar e recursos para construir mais, aguarda recursos chegarem
                 if (len(self.rockets) == 0 and self.uranium < 35 and globals.alredy_asked == True):
                     with globals.need_notify:
@@ -233,12 +233,13 @@ class SpaceBase(Thread):
                         break
 
                 if (launch_lion == True):
-                    # TODO chamar função de laçamento lion
+                    
                     globals.acquire_print()
                     print(f'🔭 - [{self.name}] → launching LION rocket')
                     globals.release_print()
+                    rocket = Thread(target=lion.launch_lion)
                     launch_lion = False
-                    # TODO Cria thread do foguete
+                    rocket.start()
 
                 else:
                     choiced_to_launch = choice(self.rockets)
