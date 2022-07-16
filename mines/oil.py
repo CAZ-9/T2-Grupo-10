@@ -41,5 +41,5 @@ class Pipeline(Thread):
 
         while(True):
             if (globals.get_release_system()):
-                return  # finaliza a thread
+                break  # finaliza a thread
             self.produce()

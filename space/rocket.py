@@ -23,7 +23,7 @@ class Rocket:
             f"[EXPLOSION] - The {self.name} ROCKET reached the planet {planet.name} on North Pole")
         print(
             f"[EXPLOSION] - The {self.name} ROCKET reached the planet {planet.name} on South Pole")
-        # TODO   decrementar a vida do planeta respectivo
+        # TODO decrementar a vida do planeta respectivo
         pass
 
     def voyage(self, planet):  # Permitida a alteração (com ressalvas)

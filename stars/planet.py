@@ -15,10 +15,9 @@ class Planet(Thread):
     def nuke_detected(self):
         while(self.terraform > 0):
             before_percentage = self.terraform
-            while(before_percentage == self.terraform):
-                pass
-            print(
-                f"[NUKE DETECTION] - The planet {self.name} was bombed. {self.terraform}% UNHABITABLE")
+            if (before_percentage != self.terraform):
+                print(f"[NUKE DETECTION] - The planet {self.name} was bombed. {self.terraform}% UNHABITABLE")
+            
 
     def print_planet_info(self):
         print(f"🪐 - [{self.name}] → {self.terraform}% UNINHABITABLE")
@@ -28,8 +27,7 @@ class Planet(Thread):
         self.print_planet_info()
         globals.release_print()
 
-        while(globals.get_release_system() == False):
-            pass
-
         while(True):
+            if (globals.get_release_system()):
+                break
             self.nuke_detected()

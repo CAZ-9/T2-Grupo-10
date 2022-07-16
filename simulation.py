@@ -96,7 +96,7 @@ def main():
     # Liberando a execução do sistema.
     sleep(0.5)
     print("\n\n##################################### SIMULATION STARTED #####################################\n")
-    globals.set_release_system()
+
 
 
 if __name__ == "__main__":
