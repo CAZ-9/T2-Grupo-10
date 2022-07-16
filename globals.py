@@ -23,7 +23,8 @@ moon_ask_lion_launch = Semaphore(0)
 alredy_asked = False  # Impede lua de pedir foguetes caso já tenha pedido
 lock_lion_launch = Lock()  # Impede deadlock na lua
 moon_wait = Condition(lock_lion_launch)  # Lua aguarda recursos
-need_notify = Lock()  # Gerencia se lua precisa de notify quando recursos chegarem
+need_notify = Lock() # Gerencia se lua precisa de notify quando recursos chegarem
+moon_constraints = Lock() # Protege região critica dos recurso da lua
 
 # * Sincronização para as viagens
 # Garante que apenas 2 foguetes estejam em rota para Marte

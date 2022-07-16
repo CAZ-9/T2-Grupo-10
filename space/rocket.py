@@ -61,15 +61,20 @@ class Rocket:
 
         else:
             return False
-
-    def lion_lauch(self):
-        sleep(0.01)  # Quatro dias para o LION chega na lua
+        
+    def lion_launch(self):
+        sleep(0.01) # Quatro dias para o LION chega na lua
         lua = globals.get_mines_ref().get('MOON')
-        lua.fuel += self.fuel_cargo  # Recarrega combustível da lua
-        lua.uranium += self.uranium_cargo  # Recarrega urânio da lua
-        # Seta false para lua poder pedir proximo LION quando necessário
-        globals.alredy_asked = False
+        with globals.moon_constraints: # Impede corrida na leitura e escrita dos recursos da lua
+            lua.fuel += self.fuel_cargo # Recarrega combustível da lua
+            lua.uranium += self.uranium_cargo # Recarrega urânio da lua
+        
+        globals.acquire_print()
+        print(f"🚀🦁 - [LION] - Arrived in MOON base - refueling ⛽ {self.fuel_cargo} ☢🪨{ self.uranium_cargo}")
+        globals.release_print()
+        
         globals.lock_lion_launch.acquire()
+        globals.alredy_asked = False # Seta false para lua poder pedir proximo LION quando necessário
         if globals.need_notify.locked():
             globals.moon_wait.notify()
         globals.lock_lion_launch.release()
@@ -82,7 +87,7 @@ class Rocket:
         ####################################################
         #                   ATENÇÃO                        #
         #     AS FUNÇÕES ABAIXO NÃO PODEM SER ALTERADAS    #
-        ###################################################
+        ####################################################
 
     def simulation_time_voyage(self, planet):
         if planet.name == 'MARS':
