@@ -63,23 +63,21 @@ class Rocket:
             return False
 
     def lion_launch(self):
-        sleep(0.01)  # Quatro dias para o LION chega na lua
-        globals.send_next_to_moon.release() # Garante que o foguete da lua sera construido e lançado
+        
+        sleep(0.01)  # Quatro dias para o foguete LION chegar na lua
         lua = globals.get_mines_ref().get('MOON')
-        with globals.moon_constraints:  # Impede corrida na leitura e escrita dos recursos da lua
-            lua.fuel += self.fuel_cargo  # Recarrega combustível da lua
-            lua.uranium += self.uranium_cargo  # Recarrega urânio da lua
+        
+        lua.fuel += self.fuel_cargo  # Recarrega combustível da lua
+        lua.uranium += self.uranium_cargo  # Recarrega urânio da lua
 
         globals.acquire_print()
-        print(f"🚀🦁 - [LION] - Arrived in MOON base - refueling ⛽ {self.fuel_cargo} ☢🪨{ self.uranium_cargo}")
+        print(f"🚀🦁🚀🦁🚀🦁 - [LION] - Arrived in MOON base - refueling ⛽ {self.fuel_cargo} ☢🪨{ self.uranium_cargo}")
         globals.release_print()
+        
+        with globals.moon_wait:
+            globals.moon_wait.notify() # Da notify para thread da lua voltar a trabalhar
 
-        globals.lock_lion_launch.acquire()
-        # Seta false para lua poder pedir proximo LION quando necessário
-        globals.alredy_asked = False
-        if globals.need_notify.locked():
-            globals.moon_wait.notify()
-        globals.lock_lion_launch.release()
+        
 
         ####################################################
         #                   ATENÇÃO                        #
