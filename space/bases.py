@@ -285,6 +285,9 @@ class SpaceBase(Thread):
                         print(f'🔭 - [{self.name}] → launching {choiced_to_launch.name} rocket 🚀🚀🚀')
                         globals.release_print()
 
+                        # * Starta a thread
+                        rocket_thread.start()
+
         globals.acquire_print()
         print(f'Thread da base {self.name} finalizada')
         globals.release_print()
