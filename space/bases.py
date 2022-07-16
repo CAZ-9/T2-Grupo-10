@@ -128,7 +128,7 @@ class SpaceBase(Thread):
                     self.uranium -= 35
 
                 else:
-                    refuel = 30000 - globals.get_bases_ref()['MOON'].fuel
+                    refuel = 30000 - globals.get_bases_ref().get['MOON'].fuel
                     if refuel >= 120:
                         refuel = 120
                     self.uranium -= 75
@@ -156,7 +156,7 @@ class SpaceBase(Thread):
                     self.uranium -= 35
 
                 else:
-                    refuel = 30000 - globals.get_bases_ref()['MOON'].fuel
+                    refuel = 30000 - globals.get_bases_ref().get['MOON'].fuel
                     if refuel >= 120:
                         refuel = 120
                     self.uranium -= 75
@@ -193,12 +193,13 @@ class SpaceBase(Thread):
                     globals.alredy_asked = True  # Seta true para não pedir foguetes caso já tenha pedido
                     globals.moon_ask_lion_launch.release()  # Lua solicita recurso
 
-                # TODO usar lock_lion_launch em um # if (lion_lock_launch.locked) #  para determinar se lua precisa de notify do foguete
+                # TODO usar lock_lion_launch em um # if (lock_lion_launch.locked) #  para determinar se lua precisa de notify do foguete
                 # impede deadlock na lua e é condição para foguete dar notify para lua
                 globals.lock_lion_launch.acquire()
                 # Se não tem foguetes para lançar e recursos para construir mais, aguarda recursos chegarem
                 if (len(self.rockets) == 0 and self.uranium < 35 and globals.alredy_asked == True):
-                    globals.moon_wait.wait()
+                    with globals.need_notify:
+                        globals.moon_wait.wait()
                     # TODO Foguete deve realizar # globals.alredy_asked == False # após chegar na lua
 
                 globals.lock_lion_launch.release()
@@ -208,7 +209,7 @@ class SpaceBase(Thread):
                 self.refuel_oil()
                 self.refuel_uranium()
 
-            # Constrói foguete se base não cheia
+            # Constrói foguete se base não cheia e tem recursos para construir
             if len(self.rockets) < self.constraints[2]:
 
                 # TODO Construir lion se MOON precisa de recursos
@@ -216,7 +217,6 @@ class SpaceBase(Thread):
                     self.try_to_build_rocket('LION')
 
                 # Construir DRAGON ou FALCON
-                # else:
                 if (self.uranium >= 35):
                     choiced_rocket = choice(random_rockets)
                     self.try_to_build_rocket(choiced_rocket)
