@@ -150,7 +150,7 @@ class SpaceBase(Thread):
                     self.uranium -= 35
 
                 else:
-                    lua =  globals.get_bases_ref().get['MOON']
+                    lua =  globals.get_bases_ref().get('MOON')
                     refuel = 30000 - lua.fuel
                     if refuel >= 120:
                         refuel = 120
@@ -179,7 +179,7 @@ class SpaceBase(Thread):
                     self.uranium -= 35
 
                 else:
-                    lua =  globals.get_bases_ref().get['MOON']
+                    lua =  globals.get_bases_ref().get('MOON')
                     refuel = 30000 - lua.fuel
                     if refuel >= 120:
                         refuel = 120
@@ -195,20 +195,25 @@ class SpaceBase(Thread):
                 globals.release_print()
 
     def run(self):
-
+        
         self.rockets = []
         random_rockets = ['DRAGON', 'FALCON']
+        
+        globals.acquire_print()
+        self.print_space_base_info()
+        globals.release_print()
 
+        while(globals.get_release_system() == False):
+            pass
+        
         while(True):
             globals.acquire_print()
             self.print_space_base_info()
             globals.release_print()
 
-            if (globals.get_release_system()):
-                break  # finaliza a thread
 
             # Se MOON, verificar se precisa de recurso
-            if (self.name == 'MOON' and self.uranium <= 75):
+            if (self.name == 'MOON' and self.uranium < 35):
 
                 if globals.alredy_asked == False:
                     globals.acquire_print()

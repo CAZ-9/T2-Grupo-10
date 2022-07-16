@@ -36,7 +36,8 @@ class Pipeline(Thread):
 
     def run(self):
 
+        while(globals.get_release_system() == False):
+            pass
+        
         while(True):
-            if (globals.get_release_system()):
-                break  # finaliza a thread
             self.produce()

@@ -27,7 +27,8 @@ class Planet(Thread):
         self.print_planet_info()
         globals.release_print()
 
+        while(globals.get_release_system() == False):
+            pass
+        
         while(True):
-            if (globals.get_release_system()):
-                break
             self.nuke_detected()
