@@ -27,16 +27,6 @@ class Rocket:
         pass
 
     def voyage(self, planet):  # Permitida a alteração (com ressalvas)
-        # Thread da base cria a thread que faz launch
-
-        # TODO lua deve estar em wait
-        # TODO alterar lógica para dar notify pra lua se o foguete for lion
-        if (planet == 'MOON'):
-            # TODO abastecer a lua
-            # semáforo para receber o lion e fazer o lançamento
-            #! qual o tempo de viagem para a lua?
-            #! self.simulation_time_voyage(planet)     # Rocket está viajando
-            return
 
         # Essa chamada de código (do_we_have_a_problem e simulation_time_voyage) não pode ser retirada.
         # Você pode inserir código antes ou depois dela e deve
@@ -49,47 +39,44 @@ class Rocket:
             #! Foguete pode orbitar
             self.nuke(planet)                   # Planeta é bombardeado
 
-    # Retorna o planeta e o polo que o foguete deve viajar
     def planning_launch(self):
-        if(self.name == 'LION'):
-            planet = 'MOON'
-            return planet
-
-        # Semáforos n=2 para garantir que não serão 3 impactos simultâneos
-        # Se >0 decrementa, mas não bloqueia
-        elif globals.voyage_mars.acquire(blocking=False):
-            planet = 'MARS'
+        '''Retorna o planeta que o foguete deve viajar, retorna falso se nenhum estiver disponível'''
+        # Semáforos n=100, esses foguetes ficarão em órbita
+        # Se < 0 decrementa, mas não bloqueia
+        if globals.voyage_mars.acquire(blocking=False):
+            planet = globals.get_planets_ref().get('mars')
             return planet
 
         elif globals.voyage_io.acquire(blocking=False):
-            planet = 'IO'
+            planet = globals.get_planets_ref().get('io')
             return planet
 
         elif globals.voyage_ganimedes.acquire(blocking=False):
-            planet = 'GANIMEDES'
+            planet = globals.get_planets_ref().get('ganimedes')
             return planet
 
         elif globals.voyage_europa.acquire(blocking=False):
-            planet = 'EUROPA'
+            planet = globals.get_planets_ref().get('europa')
             return planet
 
         else:
-            print(f'Lançamento não autorizado! Aguarde o fim de uma missão! 👩‍🚀')
             return False
-        
+
     def lion_lauch(self):
-        sleep(0.01) # Quatro dias para o LION chega na lua
+        sleep(0.01)  # Quatro dias para o LION chega na lua
         lua = globals.get_mines_ref().get('MOON')
-        lua.fuel += self.fuel_cargo # Recarrega combustível da lua
-        lua.uranium += self.uranium_cargo # Recarrega urânio da lua
-        globals.alredy_asked = False # Seta false para lua poder pedir proximo LION quando necessário
+        lua.fuel += self.fuel_cargo  # Recarrega combustível da lua
+        lua.uranium += self.uranium_cargo  # Recarrega urânio da lua
+        # Seta false para lua poder pedir proximo LION quando necessário
+        globals.alredy_asked = False
         globals.lock_lion_launch.acquire()
         if globals.need_notify.locked():
             globals.moon_wait.notify()
         globals.lock_lion_launch.release()
-        
+
         globals.acquire_print()
-        print(f"🚀 - [LION] - Arrived in MOON base - refueling ⛽{self.fuel_cargo} 🪨{self.uranium_cargo}")
+        print(
+            f"🚀 - [LION] - Arrived in MOON base - refueling ⛽{self.fuel_cargo} 🪨{self.uranium_cargo}")
         globals.release_print()
 
         ####################################################
@@ -132,6 +119,7 @@ class Rocket:
         return random()
 
     def launch(self, base, planet):
+        '''recebe objeto base e objeto planet'''
         if(self.successfull_launch(base)):
             print(f"[{self.name} - {self.id}] launched.")
             self.voyage(planet)  # !

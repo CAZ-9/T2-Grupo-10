@@ -23,26 +23,26 @@ moon_ask_lion_launch = Semaphore(0)
 alredy_asked = False  # Impede lua de pedir foguetes caso já tenha pedido
 lock_lion_launch = Lock()  # Impede deadlock na lua
 moon_wait = Condition(lock_lion_launch)  # Lua aguarda recursos
-need_notify = Lock() # Gerencia se lua precisa de notify quando recursos chegarem
+need_notify = Lock()  # Gerencia se lua precisa de notify quando recursos chegarem
 
 # * Sincronização para as viagens
 # Garante que apenas 2 foguetes estejam em rota para Marte
-voyage_mars = Semaphore(2)
+voyage_mars = Semaphore(100)
 # Se lock estiver travado rota para o polo sul
 mars_north_pole = Lock()
 
 # Garante que apenas 2 foguetes estejam em rota para Io
-voyage_io = Semaphore(2)
+voyage_io = Semaphore(100)
 # Se lock estiver travado rota para o polo sul
 io_north_pole = Lock()
 
 # Garante que apenas 2 foguetes estejam em rota para Ganimedes
-voyage_ganimedes = Semaphore(2)
+voyage_ganimedes = Semaphore(100)
 # Se lock estiver travado rota para o polo sul
 ganimedes_north_pole = Lock()
 
 # Garante que apenas 2 foguetes estejam em rota para Europa
-voyage_europa = Semaphore(2)
+voyage_europa = Semaphore(100)
 # Se lock estiver travado rota para o polo sul
 europa_north_pole = Lock()
 

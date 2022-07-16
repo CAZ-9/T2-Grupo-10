@@ -67,33 +67,33 @@ class SpaceBase(Thread):
         if self.fuel <= self.constraints[1] - globals.oil_units:
             # TODO, Será que fica mais eficiente?, Se tiver mais a disposição, pegue mais!
             # Existe oil disponível? Se não, tenho trabalho a fazer
-            if globals.available_oil.acquire(blocking=False):
-                # Existe oil disponível! Aguarda para receber
-                with globals.pipeline_units:
-                    # * Decrementa em oil_units self.unities
-                    globals.get_mines_ref().get('oil_earth').unities -= globals.oil_units
-                    globals.oil_loads - 1  # * Decrementa em 1 globals.oil_loads
-                self.fuel += globals.oil_units
-                globals.acquire_print()
-                print(f'🔭 - [{self.name}] → refuel: {self.fuel} ⛽')
-                globals.release_print()
+            globals.available_oil.acquire()
+            # Existe oil disponível! Aguarda para receber
+            with globals.pipeline_units:
+                # * Decrementa em oil_units self.unities
+                globals.get_mines_ref().get('oil_earth').unities -= globals.oil_units
+                globals.oil_loads - 1  # * Decrementa em 1 globals.oil_loads
+            self.fuel += globals.oil_units
+            globals.acquire_print()
+            print(f'🔭 - [{self.name}] → refuel: {globals.oil_units} ⛽')
+            globals.release_print()
 
     def refuel_uranium(self):
         # Têm espaço para uma carga de urânio?
         if self.uranium < self.constraints[0] - globals.uranium_units:
             # TODO, Será que fica mais eficiente?, Se tiver mais a disposição, pegue mais!
             # Existe urânio disponível? Se não, tenho trabalho a fazer
-            if globals.available_uranium.acquire(blocking=False):
-                # Existe urânio disponível! Aguarda para receber
-                with globals.store_house_units:
-                    # * Decrementa em uranium_units self.unities
-                    globals.get_mines_ref().get(
-                        'uranium_earth').unities -= globals.uranium_units
-                    globals.uranium_loads - 1  # * Decrementa em 1 globals.uranium_loads
-                self.uranium += globals.uranium_units
-                globals.acquire_print()
-                print(f'🔭 - [{self.name}] → refuel: {self.uranium} ☢')
-                globals.release_print()
+            globals.available_uranium.acquire()
+            # Existe urânio disponível! Aguarda para receber
+            with globals.store_house_units:
+                # * Decrementa em uranium_units self.unities
+                globals.get_mines_ref().get(
+                    'uranium_earth').unities -= globals.uranium_units
+                globals.uranium_loads - 1  # * Decrementa em 1 globals.uranium_loads
+            self.uranium += globals.uranium_units
+            globals.acquire_print()
+            print(f'🔭 - [{self.name}] → refuel: {globals.uranium_units} ☢')
+            globals.release_print()
 
     def try_to_build_rocket(self, choiced_rocket):
 
@@ -243,19 +243,25 @@ class SpaceBase(Thread):
                 else:
                     choiced_to_launch = choice(self.rockets)
                     self.rockets.remove(choiced_to_launch)
-                    globals.acquire_print()
-                    print(
-                        f'🔭 - [{self.name}] → launching {choiced_to_launch.name} rocket')
-                    globals.release_print()
-                    # TODO Chamar função de definição de destino
-                    # TODO Criar thread do foguete em bases
-                    # TODO Chamar função de lançamento
+                    # * Foguete escolhido
 
-                # destination = choiced_to_launch.planning_launch()  # qual planeta
-                # rocket_thread = Thread(name=self.id)
-                # rocket_thread.start(target=self.launch)  # Inicializa a thread
+                    # Foguete selecionado Chama função de definição de destino
+                    target_planet = choiced_to_launch.planning_launch()
+                    if target_planet == False:
+                        globals.acquire_print()
+                        print(
+                            f'🔭 - [{self.name}] -> [{choiced_to_launch.id}] \033[1;31mLançamento não autorizado!\033[m Aguarde o fim de uma missão! 👩‍🚀')
+                        globals.release_print()
 
-                # TODO: tentar lançar foguete chamando Rocket.launch
+                    else:
+                        # TODO Criar thread do foguete e Chama função de lançamento
+                        rocket_thread = Thread(
+                            name=choiced_to_launch.id, target=choiced_to_launch.launch, args=(self, target_planet))
+                        #choiced_to_launch.launch(self, target_planet)
+                        globals.acquire_print()
+                        print(
+                            f'🔭 - [{self.name}] → launching {choiced_to_launch.name} rocket 🚀🚀🚀')
+                        globals.release_print()
 
         globals.acquire_print()
         print(f'Thread da base {self.name} finalizada')
