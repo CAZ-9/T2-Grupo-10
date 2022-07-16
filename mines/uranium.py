@@ -30,7 +30,7 @@ class StoreHouse(Thread):
                 self.print_store_house()
 
                 # Libera para as bases receberem recurso apenas quando o recurso está disponível
-                globals.delivery_control(  # TODO: Testar delivery_control()
+                globals.delivery_control(
                     self.unities, globals.uranium_units, globals.uranium_loads, globals.available_uranium)
         sleep(0.001)
 

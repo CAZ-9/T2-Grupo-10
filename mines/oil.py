@@ -28,7 +28,6 @@ class Pipeline(Thread):
             if(self.unities < self.constraint):
                 self.unities += 17
                 self.print_pipeline()
-
                 # Libera para as bases receberem recurso apenas quando o recurso está disponível
                 globals.delivery_control(
                     self.unities, globals.oil_units, globals.oil_loads, globals.available_oil)
