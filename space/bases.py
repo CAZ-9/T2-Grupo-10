@@ -150,7 +150,7 @@ class SpaceBase(Thread):
                     self.uranium -= 35
 
                 else:
-                    lua =  globals.get_bases_ref().get('moon')
+                    lua = globals.get_bases_ref().get('moon')
                     refuel = 30000 - lua.fuel
                     if refuel >= 120:
                         refuel = 120
@@ -179,7 +179,7 @@ class SpaceBase(Thread):
                     self.uranium -= 35
 
                 else:
-                    lua =  globals.get_bases_ref().get('moon')
+                    lua = globals.get_bases_ref().get('moon')
                     refuel = 30000 - lua.fuel
                     if refuel >= 120:
                         refuel = 120
@@ -294,12 +294,9 @@ class SpaceBase(Thread):
 
                     else:
                         # TODO Criar thread do foguete e Chama função de lançamento
-                        rocket_thread = Thread(name=choiced_to_launch.id, target=choiced_to_launch.launch, args=(self, target_planet))
-                        rocket_thread.start() # Starta a thread
-                        #choiced_to_launch.launch(self, target_planet)
-                        globals.acquire_print()
-                        print(f'🔭 - [{self.name}] → launching {choiced_to_launch.name} rocket 🚀🚀🚀')
-                        globals.release_print()
+                        rocket_thread = Thread(
+                            name=choiced_to_launch.id, target=choiced_to_launch.launch, args=(self, target_planet))
+                        rocket_thread.start()  # Starta a thread
 
         globals.acquire_print()
         print(f'Thread da base {self.name} finalizada')

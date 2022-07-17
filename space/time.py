@@ -23,7 +23,7 @@ class SimulationTime(Thread):
 
         while(globals.get_release_system() == False):
             pass
-        
+
         while(True):
             print(f"{self.current_time} year(s) have passed...")
             self.current_time += 1
