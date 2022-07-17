@@ -63,7 +63,7 @@ class SpaceBase(Thread):
         globals.release_print()'''  # TODO Depois eu vejo oq vou fazer com essa merda
 
     def refuel_oil(self):
-        
+
         if self.fuel <= self.constraints[1] - 17:
             globals.available_oil.acquire()
             self.fuel += 17
@@ -72,9 +72,9 @@ class SpaceBase(Thread):
             globals.acquire_print()
             print(f'🔭 - [{self.name}] → refueling 17 ⛽')
             globals.release_print()
-        
-        # Têm espaço para uma carga de oil?    
-        
+
+        # Têm espaço para uma carga de oil?
+
         '''if self.fuel <= self.constraints[1] - globals.oil_units:
             # TODO, Será que fica mais eficiente?, Se tiver mais a disposição, pegue mais!
             # Existe oil disponível? Se não, tenho trabalho a fazer
@@ -90,7 +90,7 @@ class SpaceBase(Thread):
             globals.release_print()'''
 
     def refuel_uranium(self):
-        
+
         if self.uranium < self.constraints[0] - 15:
             globals.available_uranium.acquire()
             self.uranium += 15
@@ -99,7 +99,7 @@ class SpaceBase(Thread):
             globals.acquire_print()
             print(f'🔭 - [{self.name}] → refueling 15 ☢')
             globals.release_print()
-            
+
         # Têm espaço para uma carga de urânio?
         '''if self.uranium < self.constraints[0] - globals.uranium_units:
             # TODO, Será que fica mais eficiente?, Se tiver mais a disposição, pegue mais!
@@ -122,9 +122,9 @@ class SpaceBase(Thread):
             if (choiced_rocket == 'DRAGON' and self.fuel >= 50) or (choiced_rocket == 'FALCON' and self.fuel >= 90):
                 # Constrói foguete
                 rocket = Rocket(choiced_rocket)
-                with globals.moon_constraints: # Impede corrida na leitura e escrita dos recursos da lua
+                with globals.moon_constraints:  # Impede corrida na leitura e escrita dos recursos da lua
                     if choiced_rocket == 'DRAGON':
-                        
+
                         self.fuel -= 50
                     else:
                         self.fuel -= 90
@@ -195,22 +195,21 @@ class SpaceBase(Thread):
                 globals.release_print()
 
     def run(self):
-        
+
         self.rockets = []
         random_rockets = ['DRAGON', 'FALCON']
-        
+
         globals.acquire_print()
         self.print_space_base_info()
         globals.release_print()
 
         while(globals.get_release_system() == False):
             pass
-        
+
         while(True):
             globals.acquire_print()
             self.print_space_base_info()
             globals.release_print()
-
 
             # Se MOON, verificar se precisa de recurso
             if (self.name == 'MOON' and self.uranium < 35 and len(self.rockets) == 0):
@@ -228,7 +227,8 @@ class SpaceBase(Thread):
                     print(f'🔭 - [MOON] → request LION rocket launch 🚀🦁')
                     globals.release_print()
                     globals.alredy_asked = True  # Seta true para não pedir foguetes caso já tenha pedido
-                    globals.send_next_to_moon.acquire()  # Garante que o foguete da lua sera construido e lançado
+                    # Garante que o foguete da lua sera construido e lançado
+                    globals.send_next_to_moon.acquire()
                     globals.moon_ask_lion_launch.release()  # Lua solicita recurso
 
                 # impede deadlock na lua e é condição para foguete dar notify para lua
@@ -288,7 +288,8 @@ class SpaceBase(Thread):
                     target_planet = choiced_to_launch.planning_launch()
                     if target_planet == False:
                         globals.acquire_print()
-                        print(f'🔭 - [{self.name}] -> [{choiced_to_launch.id}] \033[1;31mLançamento não autorizado!\033[m Aguarde o fim de uma missão! 👩‍🚀')
+                        print(
+                            f'🔭 - [{self.name}] -> [{choiced_to_launch.id}] \033[1;31mLançamento não autorizado!\033[m Aguarde o fim de uma missão! 👩‍🚀')
                         globals.release_print()
 
                     else:

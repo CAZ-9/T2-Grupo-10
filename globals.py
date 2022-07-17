@@ -32,24 +32,49 @@ send_next_to_moon = Lock() # Garante que o foguete para lua será enviado'''
 
 # * Sincronização para as viagens
 # Garante que apenas 2 foguetes estejam em rota para Marte
-voyage_mars = Semaphore(100)
+voyage_mars = Semaphore(100)  # Sincronização para órbita
+colision_course_mars = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
-mars_north_pole = Lock()
+mars_north_pole = Lock()  # Bloqueia ao colidir com polo norte
+# é liberado pela colisão com o polo sul
 
-# Garante que apenas 2 foguetes estejam em rota para Io
-voyage_io = Semaphore(100)
+# Garante que apenas n foguetes estejam em rota para Io
+voyage_io = Semaphore(100)  # Sincronização para órbita
+colision_course_io = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
-io_north_pole = Lock()
+io_north_pole = Lock()  # Bloqueia ao colidir com polo norte
+# é liberado pela colisão com o polo sul
 
-# Garante que apenas 2 foguetes estejam em rota para Ganimedes
+# Garante que apenas n foguetes estejam em rota para Ganimedes
 voyage_ganimedes = Semaphore(100)
+colision_course_ganimedes = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
-ganimedes_north_pole = Lock()
+ganimedes_north_pole = Lock()  # Bloqueia ao colidir com polo norte
+# é liberado pela colisão com o polo sul
 
-# Garante que apenas 2 foguetes estejam em rota para Europa
-voyage_europa = Semaphore(100)
+# Garante que apenas n foguetes estejam em rota para Europa
+voyage_europa = Semaphore(100)  # Sincronização para órbita
+colision_course_europa = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
-europa_north_pole = Lock()
+europa_north_pole = Lock()  # Bloqueia ao colidir com polo norte
+# é liberado pela colisão com o polo sul
+
+colision_course = {
+    'MARS': colision_course_mars,
+    'IO': colision_course_io,
+    'GANIMEDES': colision_course_ganimedes,
+    'EUROPA': colision_course_europa
+}
+
+pole = {
+    'MARS': mars_north_pole,
+    'IO': io_north_pole,
+    'GANIMEDES': ganimedes_north_pole,
+    'EUROPA': europa_north_pole
+}
+
+# * Sincronização para colisão
+
 
 #! Variar para testar desempenho:
 oil_units = 17       # Valor base para receber oil
