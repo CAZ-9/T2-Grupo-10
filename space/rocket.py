@@ -17,24 +17,45 @@ class Rocket:
             self.uranium_cargo = 0
 
     def orbit(self, planet):
-        globals.colision_course.get(
-            planet.name).acquire()    # em rota de colisão
-        self.nuke(planet)
+        '''Se o planeta for inabitável, após a confirmação do satélite, permite a rota de colisão.
+        Caso contrário, a thread chega ao sem fim após printar'''
+        # retorna inabitabilidade, só pode fornecer isso a uma base de cada vez
+        if planet.satellite_get_info() > 0:  # Se não está habitável
+            globals.colision_course.get(
+                planet.name).acquire()    # em rota de colisão
+            self.nuke(planet)             # bombardeia o planeta
+        else:
+            globals.acquire_print()
+            print(
+                f"✨ - {self.name} ROCKET / ID {self.id}, is indefinitely orbiting {planet.name}.")
+            globals.release_print()
 
     def nuke(self, planet):  # Permitida a alteração
 
         if globals.pole.get(planet.name).acquire(blocking=False):
+            globals.acquire_print()
             print(
                 f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on North Pole!")
+            globals.release_print()
+
         else:
+            globals.acquire_print()
             print(
                 f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on South Pole!")
+            globals.release_print()
             globals.pole.get(planet.name).release()  # Intercalando a colisão
 
-        # TODO decrementar a vida do planeta respectivo
-        damage = self.damage()
+        #! e se o notify, que da release no lock associado, impedir que ocorra outra explosão, até saber a atual vida
+        #! até que seja indentificada a explosão pelo planeta
 
-        globals.colision_course.get(planet.name).release()    # colidiu
+        # Decrementa 'damage' da vida do planeta: #! Talvez careça de mutex, caso a inabitabilidade seja uma região crítica
+        planet.planet_takes_damage(self.damage())
+
+        # Dispara condição para acordar o planeta:
+        globals.nuclear_event_condition.get(planet.name).notify()
+
+        # colidiu, libera para uma nova colisão
+        globals.colision_course.get(planet.name).release()
 
     def voyage(self, planet):  # Permitida a alteração (com ressalvas)
 
@@ -52,7 +73,11 @@ class Rocket:
         '''Retorna o planeta que o foguete deve viajar, retorna falso se nenhum estiver disponível'''
         # Semáforos n=100, esses foguetes ficarão em órbita
         # Se < 0 decrementa, mas não bloqueia
+
         # TODO planetas que foram terraformados devem parar de ser opções
+        # Cada planeta possui um satélite orbitando-o e enviando dados aos cientistas.
+        # Não é possível duas bases consultarem os dados de um planeta ao mesmo tempo.
+
         if globals.voyage_mars.acquire(blocking=False):
             planet = globals.get_planets_ref().get('mars')
             return planet
