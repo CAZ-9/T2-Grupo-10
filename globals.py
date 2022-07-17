@@ -1,6 +1,6 @@
 # from multiprocessing import Semaphore
 from pickle import FALSE
-from threading import Lock, Condition, Semaphore
+from threading import Lock, Condition, Semaphore, BoundedSemaphore
 
 #  A total alteração deste arquivo é permitida.
 #  Lembre-se de que algumas variáveis globais são setadas no arquivo simulation.py
@@ -19,9 +19,10 @@ simulation_time = None
 
 # Sincronização de pedidos da lua
 
-moon_request_lion_launch = Semaphore() # Lua da release para solicitar foguete lion
+# Lua da release para solicitar foguete lion
+moon_request_lion_launch = Semaphore()
 moon_wait = Condition()  # Lua aguarda recursos
-next_will_be_lion = Lock() # Lua da lock para garantir que LION será construido
+next_will_be_lion = Lock()  # Lua da lock para garantir que LION será construido
 
 '''alredy_asked = False  # Impede lua de pedir foguetes caso já tenha pedido
 lock_lion_launch = Lock()  # Impede deadlock na lua
@@ -59,13 +60,36 @@ colision_course_europa = Semaphore(2)  # No máximo 2 em rota de colisão
 europa_north_pole = Lock()  # Bloqueia ao colidir com polo norte
 # é liberado pela colisão com o polo sul
 
+# * Sincronização de planetas
+# retornam erro se tentar incrementar mais que 1
+# É liberado quando houver uma explosão
+nuclear_event_mars = Lock()
+# É liberado quando houver uma explosão
+nuclear_event_io = Lock()
+# É liberado quando houver uma explosão
+nuclear_event_ganimedes = Lock()
+# É liberado quando houver uma explosão
+nuclear_event_europa = Lock()
+
+# notify() em rockets.nuke, wait() em planet.nuke:
+explosion_mars = Condition(nuclear_event_mars)
+explosion_io = Condition(nuclear_event_io)
+explosion_ganimedes = Condition(nuclear_event_ganimedes)
+explosion_europa = Condition(nuclear_event_europa)
+
+# Como descrito no enunciado, a inabitabilidade só pode ser fornecida para uma base de cada vez
+mars_satelite = Lock()
+io_satelite = Lock()
+ganimedes_satelite = Lock()
+europa_satelite = Lock()
+
+# * Sincronização para colisão
 colision_course = {
     'MARS': colision_course_mars,
     'IO': colision_course_io,
     'GANIMEDES': colision_course_ganimedes,
     'EUROPA': colision_course_europa
 }
-
 pole = {
     'MARS': mars_north_pole,
     'IO': io_north_pole,
@@ -73,7 +97,27 @@ pole = {
     'EUROPA': europa_north_pole
 }
 
-# * Sincronização para colisão
+# * Sincronização de planetas
+nuclear_event = {  # ! talvez apenas use as conditions
+    'MARS': nuclear_event_mars,
+    'IO': nuclear_event_io,
+    'GANIMEDES': nuclear_event_ganimedes,
+    'EUROPA': nuclear_event_europa
+}
+
+nuclear_event_condition = {
+    'MARS': explosion_mars,
+    'IO': explosion_io,
+    'GANIMEDES': explosion_ganimedes,
+    'EUROPA': explosion_europa
+}
+
+satellite_lock = {
+    'MARS': mars_satelite,
+    'IO': io_satelite,
+    'GANIMEDES': ganimedes_satelite,
+    'EUROPA': europa_satelite
+}
 
 
 #! Variar para testar desempenho:
