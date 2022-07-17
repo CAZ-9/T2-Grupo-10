@@ -25,22 +25,19 @@ class Rocket:
             self.nuke(planet) # bombardeia o planeta
         else:
             globals.acquire_print()
-            print(
-                f"✨ - {self.name} ROCKET / ID {self.id}, is indefinitely orbiting {planet.name}.")
+            print(f"✨ - {self.name} ROCKET / ID {self.id}, is indefinitely orbiting {planet.name}.")
             globals.release_print()
 
     def nuke(self, planet):  # Permitida a alteração
 
         if globals.pole.get(planet.name).acquire(blocking=False):
             globals.acquire_print()
-            print(
-                f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on North Pole!")
+            print(f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on North Pole!")
             globals.release_print()
 
         else:
             globals.acquire_print()
-            print(
-                f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on South Pole!")
+            print(f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on South Pole!")
             globals.release_print()
             globals.pole.get(planet.name).release()  # Intercalando a colisão
 
