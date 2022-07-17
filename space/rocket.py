@@ -21,9 +21,8 @@ class Rocket:
         Caso contrário, a thread chega ao sem fim após printar'''
         # retorna inabitabilidade, só pode fornecer isso a uma base de cada vez
         if planet.satellite_get_info() > 0:  # Se não está habitável
-            globals.colision_course.get(
-                planet.name).acquire()    # em rota de colisão
-            self.nuke(planet)             # bombardeia o planeta
+            globals.colision_course.get(planet.name).acquire()    # em rota de colisão
+            self.nuke(planet) # bombardeia o planeta
         else:
             globals.acquire_print()
             print(

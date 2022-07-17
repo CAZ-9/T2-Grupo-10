@@ -277,7 +277,6 @@ class SpaceBase(Thread):
                         choiced_rocket = choice(random_rockets)
                         self.try_to_build_rocket(choiced_rocket)
 
-            # TODO lógica de lançaento de foguetes incompleta
             # decidir qual foguete lançar
             if (len(self.rockets) > 0):
                 # checa se tem foguete lion armazenado

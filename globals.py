@@ -18,9 +18,7 @@ mines = {}
 simulation_time = None
 
 # Sincronização de pedidos da lua
-
-# Lua da release para solicitar foguete lion
-moon_request_lion_launch = Semaphore()
+moon_request_lion_launch = Semaphore() # Lua da release para solicitar foguete lion
 moon_wait = Condition()  # Lua aguarda recursos
 next_will_be_lion = Lock()  # Lua da lock para garantir que LION será construido
 
@@ -32,28 +30,28 @@ moon_constraints = Lock() # Protege região critica dos recurso da lua
 send_next_to_moon = Lock() # Garante que o foguete para lua será enviado'''
 
 # * Sincronização para as viagens
-# Garante que apenas 2 foguetes estejam em rota para Marte
+# Garante que apenas N foguetes estejam em rota para Marte
 voyage_mars = Semaphore(100)  # Sincronização para órbita
 colision_course_mars = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
 mars_north_pole = Lock()  # Bloqueia ao colidir com polo norte
 # é liberado pela colisão com o polo sul
 
-# Garante que apenas n foguetes estejam em rota para Io
+# Garante que apenas N foguetes estejam em rota para Io
 voyage_io = Semaphore(100)  # Sincronização para órbita
 colision_course_io = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
 io_north_pole = Lock()  # Bloqueia ao colidir com polo norte
 # é liberado pela colisão com o polo sul
 
-# Garante que apenas n foguetes estejam em rota para Ganimedes
+# Garante que apenas N foguetes estejam em rota para Ganimedes
 voyage_ganimedes = Semaphore(100)
 colision_course_ganimedes = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
 ganimedes_north_pole = Lock()  # Bloqueia ao colidir com polo norte
 # é liberado pela colisão com o polo sul
 
-# Garante que apenas n foguetes estejam em rota para Europa
+# Garante que apenas N foguetes estejam em rota para Europa
 voyage_europa = Semaphore(100)  # Sincronização para órbita
 colision_course_europa = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
@@ -61,13 +59,13 @@ europa_north_pole = Lock()  # Bloqueia ao colidir com polo norte
 # é liberado pela colisão com o polo sul
 
 # * Sincronização de planetas
-# notify() em rockets.nuke, wait() em planet.nuke:
+# TODO # Gerencia de notifys incompleta #  notify() em rockets.nuke, wait() em planet.nuke 
 explosion_mars = Condition()
 explosion_io = Condition()
 explosion_ganimedes = Condition()
 explosion_europa = Condition()
 
-# Como descrito no enunciado, a inabitabilidade só pode ser fornecida para uma base de cada vez
+# Como descrito no enunciado, a inabitabilidade, fornecida pelo satelite, só pode ser verificada por uma base de cada vez
 mars_satelite = Lock()
 io_satelite = Lock()
 ganimedes_satelite = Lock()
