@@ -30,4 +30,3 @@ class SimulationTime(Thread):
             sleep(1)
             if globals.finalize_threads == True:
                 break
-        

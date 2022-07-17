@@ -89,35 +89,34 @@ class Rocket:
 
         # TODO planetas que foram terraformados devem parar de ser opções
         # Cada planeta possui um satélite orbitando-o e enviando dados aos cientistas.
-        # Não é possível duas bases consultarem os dados de um planeta ao mesmo tempo.
-        
-        
-        
-        if globals.finalize_threads == False:
+        # Não é possível duas bases consultarem os dados de um planeta ao mesmo tempo
             
-            # Dicionario com semaforos que contam 100 lançamentos para um planeta simultaneamente
-            to_define_destiny_dict = globals.voyage_to 
-            
-            globals.no_more_busywating.acquire() # Impede busywating das bases
-            
-            if to_define_destiny_dict.get('MARS').acquire(blocking=False): 
-                planet = globals.get_planets_ref().get('mars')
-                return planet
+        # Dicionario com semaforos que contam 100 lançamentos para um planeta simultaneamente
+        to_define_destiny_dict = globals.voyage_to 
+        
+        globals.no_more_busywating.acquire()    # Impede busywating das bases
+        
+        if globals.finalize_threads == True:
+            return False
+        
+        if to_define_destiny_dict.get('MARS').acquire(blocking=False): 
+            planet = globals.get_planets_ref().get('mars')
+            return planet
 
-            elif to_define_destiny_dict.get('IO').acquire(blocking=False): 
-                planet = globals.get_planets_ref().get('io')
-                return planet
+        elif to_define_destiny_dict.get('IO').acquire(blocking=False): 
+            planet = globals.get_planets_ref().get('io')
+            return planet
 
-            elif to_define_destiny_dict.get('GANIMEDES').acquire(blocking=False): 
-                planet = globals.get_planets_ref().get('ganimedes')
-                return planet
+        elif to_define_destiny_dict.get('GANIMEDES').acquire(blocking=False): 
+            planet = globals.get_planets_ref().get('ganimedes')
+            return planet
 
-            elif to_define_destiny_dict.get('EUROPA').acquire(blocking=False): 
-                planet = globals.get_planets_ref().get('europa')
-                return planet
+        elif to_define_destiny_dict.get('EUROPA').acquire(blocking=False): 
+            planet = globals.get_planets_ref().get('europa')
+            return planet
 
-            else:
-                return False
+        else:
+            return False
 
     def lion_launch(self):
 

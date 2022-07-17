@@ -233,6 +233,7 @@ class SpaceBase(Thread):
             self.print_space_base_info()
             globals.release_print()
 
+            
             # Se MOON, verificar se precisa de recurso e se não tem nenhum foguete para lançar
             if ((self.name == 'MOON') and (self.uranium < 35 or self.fuel < 50) and (len(self.rockets) == 0)):
 
@@ -326,5 +327,5 @@ class SpaceBase(Thread):
                 break
 
         globals.acquire_print()
-        print(f'Thread da base {self.name} finalizada')
+        print(f'Thread of base {self.name} ended')
         globals.release_print()
