@@ -65,7 +65,7 @@ colision_course = {
 
 pole = {
     'MARS': mars_north_pole,
-    'IO': io_nor-th_pole,
+    'IO': io_north_pole,
     'GANIMEDES': ganimedes_north_pole,
     'EUROPA': europa_north_pole
 }

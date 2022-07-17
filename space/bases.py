@@ -150,7 +150,7 @@ class SpaceBase(Thread):
                     self.uranium -= 35
 
                 else:
-                    lua =  globals.get_bases_ref().get('MOON')
+                    lua = globals.get_bases_ref().get('MOON')
                     refuel = 30000 - lua.fuel
                     if refuel >= 120:
                         refuel = 120
@@ -179,7 +179,7 @@ class SpaceBase(Thread):
                     self.uranium -= 35
 
                 else:
-                    lua =  globals.get_bases_ref().get('MOON')
+                    lua = globals.get_bases_ref().get('MOON')
                     refuel = 30000 - lua.fuel
                     if refuel >= 120:
                         refuel = 120
@@ -195,22 +195,21 @@ class SpaceBase(Thread):
                 globals.release_print()
 
     def run(self):
-        
+
         self.rockets = []
         random_rockets = ['DRAGON', 'FALCON']
-        
+
         globals.acquire_print()
         self.print_space_base_info()
         globals.release_print()
 
         while(globals.get_release_system() == False):
             pass
-        
+
         while(True):
             globals.acquire_print()
             self.print_space_base_info()
             globals.release_print()
-
 
             # Se MOON, verificar se precisa de recurso
             if (self.name == 'MOON' and self.uranium < 35):
@@ -242,14 +241,14 @@ class SpaceBase(Thread):
             if len(self.rockets) < self.constraints[2]:
 
                 # Construir lion se MOON precisa de recursos
-                if (self.name != 'MOON' and self.uranium >= 75 and self.fuel >= 235 and globals.moon_ask_lion_launch.acquire(blocking=False)):
-                    self.try_to_build_rocket('LION')
+                '''if (self.name != 'MOON' and self.uranium >= 75 and self.fuel >= 235 and globals.moon_ask_lion_launch.acquire(blocking=False)):
+                    self.try_to_build_rocket('LION')'''
 
                 # Construir DRAGON ou FALCON
-                if globals.send_next_to_moon.locked() == False or self.name == 'MOON':
-                    if (self.uranium >= 35):
-                        choiced_rocket = choice(random_rockets)
-                        self.try_to_build_rocket(choiced_rocket)
+                # if globals.send_next_to_moon.locked() == False or self.name == 'MOON':
+                if (self.uranium >= 35):
+                    choiced_rocket = choice(random_rockets)
+                    self.try_to_build_rocket(choiced_rocket)
 
             # TODO lógica de lançaento de foguetes incompleta
             # decidir qual foguete lançar
@@ -287,7 +286,6 @@ class SpaceBase(Thread):
                         # TODO Criar thread do foguete e Chama função de lançamento
                         rocket_thread = Thread(
                             name=choiced_to_launch.id, target=choiced_to_launch.launch, args=(self, target_planet))
-                        rocket_thread.start()
                         #choiced_to_launch.launch(self, target_planet)
                         globals.acquire_print()
                         print(
