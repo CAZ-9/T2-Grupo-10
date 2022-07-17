@@ -231,10 +231,10 @@ class SpaceBase(Thread):
                 globals.release_print()
 
                 with globals.moon_wait:
-                    # Libera para foguete LION poder ser construído
-                    globals.moon_request_lion_launch.release()
                     # Garante que próximo foguete construído sera LION
                     globals.next_will_be_lion.acquire()
+                    # Libera para foguete LION poder ser construído
+                    globals.moon_request_lion_launch.release()
                     globals.moon_wait.wait()  # Aguarda LION chegar com recursos
 
                 # TODO verificar oque fazer com  a versão antiga

@@ -1,4 +1,5 @@
 from threading import Thread
+from time import sleep
 import globals
 
 
@@ -18,8 +19,10 @@ class Planet(Thread):
             before_percentage = self.terraform
             while(before_percentage == self.terraform):
                 pass
+            globals.acquire_print()
             print(
                 f"🪐 - [NUKE DETECTION] - The planet {self.name} was bombed. {self.terraform}% UNHABITABLE")
+            globals.release_print()
 
     def print_planet_info(self):
         print(f"🪐 - [{self.name}] → {self.terraform}% UNINHABITABLE")
@@ -31,6 +34,7 @@ class Planet(Thread):
 
     def planet_takes_damage(self, damage):
         '''Decrementa a vida do planeta'''
+        # TODO proteger variável self.terraform
         #! self.terraform é uma região crítica? Se for deve ser protegido aqui e em satélite
         self.terraform = self.terraform - damage
 
@@ -38,6 +42,9 @@ class Planet(Thread):
         globals.acquire_print()
         self.print_planet_info()
         globals.release_print()
+        #! Dar aquire nos locks antes
+        # Quando iniciar a execução, da aquire no lock da condition
+        # globals.nuclear_event.get(self.name).acquire()
 
         while(globals.get_release_system() == False):
             pass
