@@ -82,7 +82,7 @@ class Rocket:
 
         globals.acquire_print()
         print(
-            f"🚀🦁🚀🦁🚀🦁 - [LION] - Arrived in MOON base - refueling ⛽ {self.fuel_cargo} ☢🪨{ self.uranium_cargo}")
+            f"🚀🦁🚀🦁🚀🦁 - [LION] - Arrived in MOON base - refueling ⛽ {self.fuel_cargo} ☢ { self.uranium_cargo}")
         globals.release_print()
 
         with globals.moon_wait:
@@ -130,5 +130,5 @@ class Rocket:
     def launch(self, base, planet):
         '''recebe objeto base e objeto planet'''
         if(self.successfull_launch(base)):
-            print(f"[{self.name} - {self.id}] launched.")
+            print(f"[{self.name} - {self.id}] launched from [{base.name}].")
             self.voyage(planet)

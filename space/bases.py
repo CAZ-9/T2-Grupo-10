@@ -122,7 +122,7 @@ class SpaceBase(Thread):
             if (choiced_rocket == 'DRAGON' and self.fuel >= 50) or (choiced_rocket == 'FALCON' and self.fuel >= 90):
                 # Constrói foguete
                 rocket = Rocket(choiced_rocket)
-    
+
                 if choiced_rocket == 'DRAGON':
                     self.fuel -= 50
                 else:
@@ -240,7 +240,7 @@ class SpaceBase(Thread):
                 globals.lock_lion_launch.release()'''
 
             # Se !MOON,coleta recurso das minas
-            else:
+            elif self.name != 'MOON':
                 self.refuel_oil()
                 self.refuel_uranium()
 
