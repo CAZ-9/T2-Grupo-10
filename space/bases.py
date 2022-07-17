@@ -150,7 +150,7 @@ class SpaceBase(Thread):
                     self.uranium -= 35
 
                 else:
-                    lua =  globals.get_bases_ref().get('MOON')
+                    lua =  globals.get_bases_ref().get('moon')
                     refuel = 30000 - lua.fuel
                     if refuel >= 120:
                         refuel = 120
@@ -179,7 +179,7 @@ class SpaceBase(Thread):
                     self.uranium -= 35
 
                 else:
-                    lua =  globals.get_bases_ref().get('MOON')
+                    lua =  globals.get_bases_ref().get('moon')
                     refuel = 30000 - lua.fuel
                     if refuel >= 120:
                         refuel = 120
@@ -213,9 +213,17 @@ class SpaceBase(Thread):
 
 
             # Se MOON, verificar se precisa de recurso
-            if (self.name == 'MOON' and self.uranium < 35):
+            if (self.name == 'MOON' and self.uranium < 35 and len(self.rockets) == 0):
+                # TODO Lua 2.0 caralho AGORA VAI
+                globals.acquire_print()
+                print(f'🔭 - [MOON] → request LION rocket launch 🚀🦁')
+                globals.release_print()
+                globals.moon_request_lion_launch.release()
+                with globals.moon_wait:
+                    globals.next_will_be_lion.acquire()
+                    globals.moon_wait.wait()
 
-                if globals.alredy_asked == False:
+                '''if globals.alredy_asked == False:
                     globals.acquire_print()
                     print(f'🔭 - [MOON] → request LION rocket launch 🚀🦁')
                     globals.release_print()
@@ -230,7 +238,7 @@ class SpaceBase(Thread):
                     with globals.need_notify:
                         globals.moon_wait.wait()
 
-                globals.lock_lion_launch.release()
+                globals.lock_lion_launch.release()'''
 
             # Se !MOON,coleta recurso das minas
             else:
@@ -240,12 +248,14 @@ class SpaceBase(Thread):
             # Constrói foguete se base não cheia e tem recursos para construir
             if len(self.rockets) < self.constraints[2]:
 
-                 # Construir lion se MOON precisa de recursos
-                if (self.name != 'MOON' and self.uranium >= 75 and self.fuel >= 235 and globals.moon_ask_lion_launch.acquire(blocking=False)):
+                # Construir lion se MOON precisa de recursos
+                if (self.name != 'MOON' and self.uranium >= 75 and self.fuel >= 235 and globals.moon_request_lion_launch.acquire(blocking=False)):
+                    # TODO dar release em next_will_be_lion
+                    globals.next_will_be_lion.release()
                     self.try_to_build_rocket('LION')
 
                 # Construir DRAGON ou FALCON
-                if globals.send_next_to_moon.locked() == False or self.name == 'MOON':
+                if globals.next_will_be_lion.locked() == False:
                     if (self.uranium >= 35):
                         choiced_rocket = choice(random_rockets)
                         self.try_to_build_rocket(choiced_rocket)
@@ -256,16 +266,16 @@ class SpaceBase(Thread):
                 # checa se tem foguete lion armazenado
                 launch_lion = False
                 for x in range(len(self.rockets)):
-                    if self.rockets[x] == 'LION':
+                    if self.rockets[x].name == 'LION':
                         launch_lion = True
                         lion = self.rockets.pop(x)
                         break
 
                 if (launch_lion == True):
                     globals.acquire_print()
-                    print(f'🔭 - [{self.name}] → launching LION rocket🦁')
+                    print(f'🔭 - [{self.name}] → launching LION rocket  🦁🦁🦁')
                     globals.release_print()
-                    rocket = Thread(target=lion.launch_lion)
+                    rocket = Thread(target=lion.lion_launch)
                     launch_lion = False
                     rocket.start()
 
@@ -284,14 +294,11 @@ class SpaceBase(Thread):
                     else:
                         # TODO Criar thread do foguete e Chama função de lançamento
                         rocket_thread = Thread(name=choiced_to_launch.id, target=choiced_to_launch.launch, args=(self, target_planet))
-                        rocket_thread.start()
+                        rocket_thread.start() # Starta a thread
                         #choiced_to_launch.launch(self, target_planet)
                         globals.acquire_print()
                         print(f'🔭 - [{self.name}] → launching {choiced_to_launch.name} rocket 🚀🚀🚀')
                         globals.release_print()
-
-                        # * Starta a thread
-                        rocket_thread.start()
 
         globals.acquire_print()
         print(f'Thread da base {self.name} finalizada')

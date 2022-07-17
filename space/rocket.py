@@ -65,7 +65,7 @@ class Rocket:
     def lion_launch(self):
         
         sleep(0.01)  # Quatro dias para o foguete LION chegar na lua
-        lua = globals.get_mines_ref().get('MOON')
+        lua = globals.get_mines_ref().get('moon')
         
         lua.fuel += self.fuel_cargo  # Recarrega combustível da lua
         lua.uranium += self.uranium_cargo  # Recarrega urânio da lua
@@ -75,7 +75,7 @@ class Rocket:
         globals.release_print()
         
         with globals.moon_wait:
-            globals.moon_wait.notify() # Da notify para thread da lua voltar a trabalhar
+            globals.moon_wait.notify() # Da notify para base da lua voltar a trabalhar
 
         
 

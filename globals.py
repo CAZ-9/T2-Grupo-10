@@ -18,14 +18,17 @@ mines = {}
 simulation_time = None
 
 # Sincronização de pedidos da lua
-# Lua da release para solicitar foguete lion
-moon_ask_lion_launch = Semaphore(0)
-alredy_asked = False  # Impede lua de pedir foguetes caso já tenha pedido
+
+moon_request_lion_launch = Semaphore() # Lua da release para solicitar foguete lion
+moon_wait = Condition()  # Lua aguarda recursos
+next_will_be_lion = Lock() # Lua da lock para garantir que LION será construido
+
+'''alredy_asked = False  # Impede lua de pedir foguetes caso já tenha pedido
 lock_lion_launch = Lock()  # Impede deadlock na lua
-moon_wait = Condition(lock_lion_launch)  # Lua aguarda recursos
+
 need_notify = Lock() # Gerencia se lua precisa de notify quando recursos chegarem
 moon_constraints = Lock() # Protege região critica dos recurso da lua
-send_next_to_moon = Lock() # Garante que o foguete para lua será enviado
+send_next_to_moon = Lock() # Garante que o foguete para lua será enviado'''
 
 # * Sincronização para as viagens
 # Garante que apenas 2 foguetes estejam em rota para Marte
