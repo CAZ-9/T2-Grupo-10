@@ -61,21 +61,11 @@ europa_north_pole = Lock()  # Bloqueia ao colidir com polo norte
 # é liberado pela colisão com o polo sul
 
 # * Sincronização de planetas
-# retornam erro se tentar incrementar mais que 1
-# É liberado quando houver uma explosão
-nuclear_event_mars = Lock()
-# É liberado quando houver uma explosão
-nuclear_event_io = Lock()
-# É liberado quando houver uma explosão
-nuclear_event_ganimedes = Lock()
-# É liberado quando houver uma explosão
-nuclear_event_europa = Lock()
-
 # notify() em rockets.nuke, wait() em planet.nuke:
-explosion_mars = Condition(nuclear_event_mars)
-explosion_io = Condition(nuclear_event_io)
-explosion_ganimedes = Condition(nuclear_event_ganimedes)
-explosion_europa = Condition(nuclear_event_europa)
+explosion_mars = Condition()
+explosion_io = Condition()
+explosion_ganimedes = Condition()
+explosion_europa = Condition()
 
 # Como descrito no enunciado, a inabitabilidade só pode ser fornecida para uma base de cada vez
 mars_satelite = Lock()
@@ -95,14 +85,6 @@ pole = {
     'IO': io_north_pole,
     'GANIMEDES': ganimedes_north_pole,
     'EUROPA': europa_north_pole
-}
-
-# * Sincronização de planetas
-nuclear_event = {  # ! talvez apenas use as conditions
-    'MARS': nuclear_event_mars,
-    'IO': nuclear_event_io,
-    'GANIMEDES': nuclear_event_ganimedes,
-    'EUROPA': nuclear_event_europa
 }
 
 nuclear_event_condition = {

@@ -52,9 +52,10 @@ class Rocket:
         planet.planet_takes_damage(self.damage())
 
         # Dispara condição para acordar o planeta:
-        
-        globals.nuclear_event_condition.get(planet.name).notify()
-        
+
+        #! Notify dentro de nuke
+        # globals.nuclear_event_condition.get(planet.name).notify()
+
         # colidiu, libera para uma nova colisão
         globals.colision_course.get(planet.name).release()
 
