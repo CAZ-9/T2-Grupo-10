@@ -1,4 +1,5 @@
 from threading import Thread, Condition, Semaphore
+from time import time
 import globals
 
 
@@ -61,20 +62,25 @@ class Planet(Thread):
             # TODO descomentar abaixo, e refletir se vale mesmo a pena acabar com o busy wait de todos os planetas
             # globals.nuclear_event_condition.get(self.name).wait()
             self.nuke_detected()       # Printa após atualizar satellite
-            globals.colision_course.get(self.name).release(globals.colision_course.get(self.name)._value)
-            planets = globals.get_planets_ref()    
             
+            break 
+        
+        globals.colision_course.get(self.name).release(globals.colision_course.get(self.name)._value)
+        planets = globals.get_planets_ref()    
+        
+        time = globals.get_simulation_time().simulation_time()
+        
+        globals.acquire_print()
+        print(f'🪐 - [{self.name}] - Terraform completed in {time} years')
+        globals.release_print()
+        
+        if (planets.get('mars').terraform < 0 and planets.get('io').terraform < 0
+            and planets.get('ganimedes').terraform < 0 and planets.get('europa').terraform < 0):
+            globals.finalize_threads = True
+            globals.no_more_busywating.release(4)
             globals.acquire_print()
-            print(f'🪐 - [{self.name}] - Terraform completed in {globals.get_simulation_time()} years')
+            print(f'All planets terraformed in {time} years')
             globals.release_print()
-            
-            if (planets.get('mars').terraform < 0 and planets.get('io').terraform < 0
-                and planets.get('ganimedes').terraform < 0 and planets.get('europa').terraform < 0):
-                globals.finalize_threads = True
-                globals.no_more_busywating.release(4)
-                globals.acquire_print()
-                print(f'All planets terraformed in {globals.get_simulation_time()} years')
-                globals.release_print()
             
                 
             
