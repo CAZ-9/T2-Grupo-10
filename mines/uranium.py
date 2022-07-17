@@ -24,11 +24,11 @@ class StoreHouse(Thread):
             f"🔨 - [{self.location}] → {self.unities} uranium unities are produced ☢ .")
 
     def produce(self):
-        with globals.store_house_units:  # Acesso a store_house_units
+        with globals.store_house_units:  # Protege acesso a SoreHouse.units !! Região cŕitica !!
             if(self.unities < self.constraint):
                 self.unities += 15
                 self.print_store_house()
-        globals.available_uranium.release()
+        globals.available_uranium.release() # Incrementa para bases saberem que podem pegar uma porção de urânio
 
         #   Libera para as bases receberem recurso apenas quando o recurso está disponível
         #   globals.delivery_control(  # TODO: Testar delivery_control()

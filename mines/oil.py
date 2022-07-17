@@ -23,11 +23,11 @@ class Pipeline(Thread):
 
     def produce(self):
         
-        with globals.pipeline_units:  # Acesso a pipeline_units
+        with globals.pipeline_units:  # Protege acesso a Pipeline.units !! Região crítica !!
             if(self.unities < self.constraint):
                 self.unities += 17
                 self.print_pipeline()
-        globals.available_oil.release()
+        globals.available_oil.release() # Incrementa para bases saberem que podem pegar uma porção de óleo
 
                 # Libera para as bases receberem recurso apenas quando o recurso está disponível
                 #globals.delivery_control(
