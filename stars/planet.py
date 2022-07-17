@@ -1,5 +1,4 @@
-from threading import Thread
-from time import sleep
+from threading import Thread, Condition, Semaphore
 import globals
 
 
@@ -14,14 +13,18 @@ class Planet(Thread):
         self.name = name
 
     def nuke_detected(self):
-
+        planet_condition = globals.nuclear_event_condition.get(self.name)
+        
         while(self.terraform > 0):
-            before_percentage = self.terraform
+            '''before_percentage = self.terraform
             while(before_percentage == self.terraform):
-                pass
+                pass'''
+                
+            with planet_condition:
+                planet_condition.wait() # Impede busywaiting nos planetas
+                 
             globals.acquire_print()
-            print(
-                f"🪐 - [NUKE DETECTION] - The planet {self.name} was bombed. {self.terraform}% UNHABITABLE")
+            print(f"🪐 - [NUKE DETECTION] - The planet {self.name} was bombed. {self.terraform}% UNHABITABLE")
             globals.release_print()
 
     def print_planet_info(self):
@@ -58,3 +61,10 @@ class Planet(Thread):
             # TODO descomentar abaixo, e refletir se vale mesmo a pena acabar com o busy wait de todos os planetas
             # globals.nuclear_event_condition.get(self.name).wait()
             self.nuke_detected()       # Printa após atualizar satellite
+            globals.colision_course.get(self.name).release(globals.N)
+            planets = globals.get_planets_ref()    
+            if (planets.get('mars').terraform < 0 and planets.get('io').terraform < 0
+                and planets.get('ganimedes').terraform < 0 and planets.get('europa').terraform < 0):
+                globals.finalize_threads = True
+                
+            

@@ -19,9 +19,12 @@ class Rocket:
     def orbit(self, planet):
         '''Se o planeta for inabitável, após a confirmação do satélite, permite a rota de colisão.
         Caso contrário, a thread chega ao sem fim após printar'''
-        # retorna inabitabilidade, só pode fornecer isso a uma base de cada vez
+        
+        
+        globals.colision_course.get(planet.name).acquire() # Aguarda para colisão
+        
+        # retorna inabitabilidade. Se planeta habitável, foguete não colide  ## só pode fornecer isso a uma base de cada vez ##
         if planet.satellite_get_info() > 0:  # Se não está habitável
-            globals.colision_course.get(planet.name).acquire()    # em rota de colisão
             self.nuke(planet) # bombardeia o planeta
         else:
             globals.acquire_print()
@@ -50,10 +53,16 @@ class Rocket:
         # Dispara condição para acordar o planeta:
 
         #! Notify dentro de nuke
-        # globals.nuclear_event_condition.get(planet.name).notify()
+        with globals.nuclear_event_condition.get(planet.name):
+            globals.nuclear_event_condition.get(planet.name).notify()
 
         # colidiu, libera para uma nova colisão
         globals.colision_course.get(planet.name).release()
+        # colidiu, libera para um novo lançamento
+        globals.voyage_to.get(planet.name).release()
+        # Impede busywaiting nas bases
+        globals.no_more_busywating.release()
+        
 
     def voyage(self, planet):  # Permitida a alteração (com ressalvas)
 
@@ -63,9 +72,15 @@ class Rocket:
 
         self.simulation_time_voyage(planet)     # Rocket está viajando
         failure = self.do_we_have_a_problem()   # Testa falha
-        if failure == False:                    # Se não ouveuma falha
+        
+        # Foguete entra em órbita do Planeta
+        if failure == False:                    # Se não ouve uma falha
             self.orbit(planet)                  # fica em órbita
-            # Foguete entra em órbita do Planeta
+        
+        else:
+            globals.no_more_busywating.release()
+            globals.voyage_to.get(planet.name).release()
+            
 
     def planning_launch(self):
         '''Retorna o planeta que o foguete deve viajar, retorna falso se nenhum estiver disponível'''
@@ -75,25 +90,34 @@ class Rocket:
         # TODO planetas que foram terraformados devem parar de ser opções
         # Cada planeta possui um satélite orbitando-o e enviando dados aos cientistas.
         # Não é possível duas bases consultarem os dados de um planeta ao mesmo tempo.
+        
+        
+        
+        if globals.finalize_threads == False:
+            
+            # Dicionario com semaforos que contam 100 lançamentos para um planeta simultaneamente
+            to_define_destiny_dict = globals.voyage_to 
+            
+            globals.no_more_busywating.acquire() # Impede busywating das bases
+            
+            if to_define_destiny_dict.get('MARS').acquire(blocking=False): 
+                planet = globals.get_planets_ref().get('mars')
+                return planet
 
-        if globals.voyage_mars.acquire(blocking=False):
-            planet = globals.get_planets_ref().get('mars')
-            return planet
+            elif to_define_destiny_dict.get('IO').acquire(blocking=False): 
+                planet = globals.get_planets_ref().get('io')
+                return planet
 
-        elif globals.voyage_io.acquire(blocking=False):
-            planet = globals.get_planets_ref().get('io')
-            return planet
+            elif to_define_destiny_dict.get('GANIMEDES').acquire(blocking=False): 
+                planet = globals.get_planets_ref().get('ganimedes')
+                return planet
 
-        elif globals.voyage_ganimedes.acquire(blocking=False):
-            planet = globals.get_planets_ref().get('ganimedes')
-            return planet
+            elif to_define_destiny_dict.get('EUROPA').acquire(blocking=False): 
+                planet = globals.get_planets_ref().get('europa')
+                return planet
 
-        elif globals.voyage_europa.acquire(blocking=False):
-            planet = globals.get_planets_ref().get('europa')
-            return planet
-
-        else:
-            return False
+            else:
+                return False
 
     def lion_launch(self):
 
@@ -155,3 +179,8 @@ class Rocket:
         if(self.successfull_launch(base)):
             print(f"🚀 - [{self.name} - {self.id}] launched from [{base.name}].")
             self.voyage(planet)
+        
+        else:
+            globals.no_more_busywating.release()
+            globals.voyage_to.get(planet.name).release()
+            

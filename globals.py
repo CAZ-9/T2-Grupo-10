@@ -1,6 +1,6 @@
 # from multiprocessing import Semaphore
 from pickle import FALSE
-from threading import Lock, Condition, Semaphore, BoundedSemaphore
+from threading import Lock, Condition, Semaphore
 
 #  A total alteração deste arquivo é permitida.
 #  Lembre-se de que algumas variáveis globais são setadas no arquivo simulation.py
@@ -17,6 +17,8 @@ bases = {}
 mines = {}
 simulation_time = None
 
+finalize_threads = False # Variável para finalizar threads qnd todos planetas forem terraformados
+
 # Sincronização de pedidos da lua
 moon_request_lion_launch = Semaphore() # Lua da release para solicitar foguete lion
 moon_wait = Condition()  # Lua aguarda recursos
@@ -28,42 +30,49 @@ lock_lion_launch = Lock()  # Impede deadlock na lua
 need_notify = Lock() # Gerencia se lua precisa de notify quando recursos chegarem
 moon_constraints = Lock() # Protege região critica dos recurso da lua
 send_next_to_moon = Lock() # Garante que o foguete para lua será enviado'''
-
+N = 10
 # * Sincronização para as viagens
 # Garante que apenas N foguetes estejam em rota para Marte
-voyage_mars = Semaphore(100)  # Sincronização para órbita
+voyage_to_mars = Semaphore(N)  # Sincronização para órbita
 colision_course_mars = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
 mars_north_pole = Lock()  # Bloqueia ao colidir com polo norte
 # é liberado pela colisão com o polo sul
 
 # Garante que apenas N foguetes estejam em rota para Io
-voyage_io = Semaphore(100)  # Sincronização para órbita
+voyage_to_io = Semaphore(N)  # Sincronização para órbita
 colision_course_io = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
 io_north_pole = Lock()  # Bloqueia ao colidir com polo norte
 # é liberado pela colisão com o polo sul
 
 # Garante que apenas N foguetes estejam em rota para Ganimedes
-voyage_ganimedes = Semaphore(100)
+voyage_to_ganimedes = Semaphore(N)
 colision_course_ganimedes = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
 ganimedes_north_pole = Lock()  # Bloqueia ao colidir com polo norte
 # é liberado pela colisão com o polo sul
 
 # Garante que apenas N foguetes estejam em rota para Europa
-voyage_europa = Semaphore(100)  # Sincronização para órbita
+voyage_to_europa = Semaphore(N)  # Sincronização para órbita
 colision_course_europa = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
 europa_north_pole = Lock()  # Bloqueia ao colidir com polo norte
 # é liberado pela colisão com o polo sul
 
+no_more_busywating = Semaphore(N*4) # Impede busywaiting das bases
+
 # * Sincronização de planetas
-# TODO # Gerencia de notifys incompleta #  notify() em rockets.nuke, wait() em planet.nuke 
 explosion_mars = Condition()
 explosion_io = Condition()
 explosion_ganimedes = Condition()
 explosion_europa = Condition()
+
+# Define se o planeta precisa de um notify
+'''can_i_notify_mars = Lock()
+can_i_notify_io = Lock()
+can_i_notify_ganimedes = Lock()
+can_i_notify_europa = Lock()'''
 
 # Como descrito no enunciado, a inabitabilidade, fornecida pelo satelite, só pode ser verificada por uma base de cada vez
 mars_satelite = Lock()
@@ -99,6 +108,18 @@ satellite_lock = {
     'EUROPA': europa_satelite
 }
 
+voyage_to = {
+    'MARS': voyage_to_mars,
+    'IO': voyage_to_io,
+    'GANIMEDES': voyage_to_ganimedes,
+    'EUROPA': voyage_to_europa
+}
+'''can_i_notify = {
+    'MARS': can_i_notify_mars,
+    'IO': can_i_notify_io,
+    'GANIMEDES': can_i_notify_ganimedes,
+    'EUROPA': can_i_notify_europa
+}'''
 
 #! Variar para testar desempenho:
 oil_units = 17       # Valor base para receber oil
