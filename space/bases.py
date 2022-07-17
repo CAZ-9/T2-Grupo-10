@@ -281,7 +281,6 @@ class SpaceBase(Thread):
 
                 else:
                     choiced_to_launch = choice(self.rockets)
-                    self.rockets.remove(choiced_to_launch)
                     # * Foguete escolhido
 
                     # Foguete selecionado Chama função de definição de destino
@@ -297,6 +296,7 @@ class SpaceBase(Thread):
                         rocket_thread = Thread(
                             name=choiced_to_launch.id, target=choiced_to_launch.launch, args=(self, target_planet))
                         rocket_thread.start()  # Starta a thread
+                        self.rockets.remove(choiced_to_launch)
 
         globals.acquire_print()
         print(f'Thread da base {self.name} finalizada')

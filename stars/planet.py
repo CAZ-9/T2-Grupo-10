@@ -13,6 +13,7 @@ class Planet(Thread):
         self.name = name
 
     def nuke_detected(self):
+        # TODO condition para ficar aguardando
         while(self.terraform > 0):
             before_percentage = self.terraform
             while(before_percentage == self.terraform):
