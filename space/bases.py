@@ -122,13 +122,12 @@ class SpaceBase(Thread):
             if (choiced_rocket == 'DRAGON' and self.fuel >= 50) or (choiced_rocket == 'FALCON' and self.fuel >= 90):
                 # Constrói foguete
                 rocket = Rocket(choiced_rocket)
-                with globals.moon_constraints:  # Impede corrida na leitura e escrita dos recursos da lua
-                    if choiced_rocket == 'DRAGON':
-
-                        self.fuel -= 50
-                    else:
-                        self.fuel -= 90
-                    self.uranium -= 35
+    
+                if choiced_rocket == 'DRAGON':
+                    self.fuel -= 50
+                else:
+                    self.fuel -= 90
+                self.uranium -= 35
 
                 # Adiciona foguete ao armazenamento da base
                 self.rockets.append(rocket)
