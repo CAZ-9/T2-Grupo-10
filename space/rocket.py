@@ -67,7 +67,7 @@ class Rocket:
         failure = self.do_we_have_a_problem()   # Testa falha
         if failure == False:                    # Se não ouveuma falha
             self.orbit(planet)                  # fica em órbita
-            # Planeta é bombardeado
+            # Foguete entra em órbita do Planeta
 
     def planning_launch(self):
         '''Retorna o planeta que o foguete deve viajar, retorna falso se nenhum estiver disponível'''
@@ -106,7 +106,8 @@ class Rocket:
         lua.uranium += self.uranium_cargo  # Recarrega urânio da lua
 
         globals.acquire_print()
-        print(f"🚀🦁🚀🦁🚀🦁 - [LION] - Arrived in MOON base - refueling ⛽ {self.fuel_cargo} ☢ { self.uranium_cargo}")
+        print(
+            f"🌑🦁 - [LION] - Arrived in MOON base - refueling ⛽ {self.fuel_cargo} ☢ { self.uranium_cargo}")
         globals.release_print()
 
         with globals.moon_wait:
@@ -154,5 +155,5 @@ class Rocket:
     def launch(self, base, planet):
         '''recebe objeto base e objeto planet'''
         if(self.successfull_launch(base)):
-            print(f"[{self.name} - {self.id}] launched from [{base.name}].")
+            print(f"🚀 - [{self.name} - {self.id}] launched from [{base.name}].")
             self.voyage(planet)

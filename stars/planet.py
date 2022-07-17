@@ -19,7 +19,7 @@ class Planet(Thread):
             while(before_percentage == self.terraform):
                 pass
             print(
-                f"[NUKE DETECTION] - The planet {self.name} was bombed. {self.terraform}% UNHABITABLE")
+                f"🪐 - [NUKE DETECTION] - The planet {self.name} was bombed. {self.terraform}% UNHABITABLE")
 
     def print_planet_info(self):
         print(f"🪐 - [{self.name}] → {self.terraform}% UNINHABITABLE")
