@@ -17,44 +17,41 @@ class Rocket:
             self.uranium_cargo = 0
 
     def orbit(self, planet):
-        '''Se o planeta for inabitável, após a confirmação do satélite, permite a rota de colisão.
-        Caso contrário, a thread chega ao sem fim após printar'''
+        '''Seguindo a informação do satélite, se o planeta for inabitável permite a rota de colisão.
+        Caso contrário, a thread foguete chega ao sem fim após printar'''
         
-        globals.colision_course.get(planet.name).acquire() # Aguarda para colisão no máximo 2 de cada vez
+        # Satisfaz a regra que apenas 2 foguetes por vez podem colidir com o planeta
+        globals.colision_course.get(planet.name).acquire() 
 
-        # retorna inabitabilidade. Se planeta habitável, foguete não colide  ## só pode fornecer isso a uma base de cada vez ##
+        # Satisfaz a regra de verificar planet.terraform com a limitação da tecnologia
         if planet.satellite_get_info() > 0:  # Se não está habitável
             self.nuke(planet) # bombardeia o planeta
+        
+        # Se planeta for habitável, foguete não colide com o planeta
         else:
             globals.acquire_print()
             print(f"✨ - {self.name} ROCKET / ID {self.id}, is indefinitely orbiting {planet.name}.")
             globals.release_print()
 
     def nuke(self, planet):  # Permitida a alteração
-    
+        ''' Satisfaz a regra de não haver colisão simultânea no mesmo polo'''
+
         if globals.pole.get(planet.name).acquire(blocking=False):
+
             globals.acquire_print()
             print(f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on North Pole!")
             globals.release_print()
-            planet.planet_takes_damage(self.damage())
+            
+            planet.planet_takes_damage(self.damage())   # Dano da explosão
             globals.pole.get(planet.name).release()
 
         else:
             globals.acquire_print()
             print(f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on South Pole!")
             globals.release_print()
-            planet.planet_takes_damage(self.damage())
-              # Intercalando a colisão'''
+            planet.planet_takes_damage(self.damage())   # Dano da explosão
 
-        #! e se o notify, que da release no lock associado, impedir que ocorra outra explosão, até saber a atual vida
-        #! até que seja indentificada a explosão pelo planeta
-
-        # Decrementa 'damage' da vida do planeta: #! Talvez careça de mutex, caso a inabitabilidade seja uma região crítica
-        
-
-        # Dispara condição para acordar o planeta:
-
-        #! Notify dentro de nuke
+        # Notifica o condition que impede busy waiting nos planetas
         with globals.nuclear_event_condition.get(planet.name):
             globals.nuclear_event_condition.get(planet.name).notify()
 
@@ -63,6 +60,7 @@ class Rocket:
         # colidiu, libera para um novo lançamento
         globals.voyage_to.get(planet.name).release()
         # Impede busywaiting nas bases
+        #TODO verificar dps 
         globals.no_more_busywating.release()
         
 
@@ -77,16 +75,20 @@ class Rocket:
         
         # Foguete entra em órbita do Planeta
         if failure == False:                    # Se não ouve uma falha
-            self.orbit(planet)                  # fica em órbita
+            self.orbit(planet)                  # entra em órbita
         
+        # Libera para novo lançamento caso o foguete falhe
         else:
+            # Impede busywaiting nas bases
+            #TODO verificar dps 
             globals.no_more_busywating.release()
             globals.voyage_to.get(planet.name).release()
             
 
     def planning_launch(self):
+        #TODO 
         '''Retorna o planeta que o foguete deve viajar, retorna falso se nenhum estiver disponível'''
-        # Semáforos n=100, esses foguetes ficarão em órbita
+        # Semáforos de valor N
         # Se < 0 decrementa, mas não bloqueia
 
         # TODO planetas que foram terraformados devem parar de ser opções
@@ -130,7 +132,7 @@ class Rocket:
         lua.uranium += self.uranium_cargo  # Recarrega urânio da lua
 
         globals.acquire_print()
-        print(f"🌑🦁 - [LION] - Arrived in MOON base - refueling ⛽ {self.fuel_cargo} ☢ { self.uranium_cargo}")
+        print(f"🦁 - [LION] - Arrived in MOON 🌑 base - refueling ⛽ {self.fuel_cargo} ☢ { self.uranium_cargo}")
         globals.release_print()
 
         with globals.moon_wait:
@@ -181,6 +183,7 @@ class Rocket:
             print(f"🚀 - [{self.name} - {self.id}] launched from [{base.name}].")
             self.voyage(planet)
         
+        # caso falhe o lançamento, libera um novo lançamento
         else:
             globals.no_more_busywating.release()
             globals.voyage_to.get(planet.name).release()
