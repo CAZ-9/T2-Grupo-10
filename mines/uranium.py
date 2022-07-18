@@ -20,14 +20,18 @@ class StoreHouse(Thread):
         self.constraint = constraint
 
     def print_store_house(self):
+        globals.acquire_print()
         print(f"🔨 - [{self.location}] → {self.unities} uranium unities are produced ☢ .")
+        globals.release_print()
 
     def produce(self):
         with globals.store_house_units:  # Protege acesso a SoreHouse.units !! Região cŕitica !!
             if(self.unities < self.constraint):
                 self.unities += 15
                 self.print_store_house()
-        globals.available_uranium.release() # Incrementa para bases saberem que podem pegar uma porção de urânio
+                # Incrementa para bases saberem que podem pegar uma porção de urânio
+                globals.available_uranium.release()
+         
 
         sleep(0.001)
 

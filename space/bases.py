@@ -1,4 +1,5 @@
 from pickle import FALSE, TRUE
+from weakref import finalize
 import globals
 from threading import Thread, Lock, Semaphore
 from space.rocket import Rocket
@@ -65,15 +66,15 @@ class SpaceBase(Thread):
                 else:
                     lua = globals.get_bases_ref().get('moon')
                     delivery_fuel = 30000 - lua.fuel
-                    refuel_uranium = 150 - lua.uranium
+                    delivery_uranium = 150 - lua.uranium
                     
                     if delivery_fuel >= 120:
                         delivery_fuel = 120
-                    if  refuel_uranium >= 75:
-                        refuel_uranium = 75
+                    if  delivery_uranium >= 75:
+                        delivery_uranium = 75
                         
-                    self.uranium -= refuel_uranium
-                    rocket.uranium_cargo += refuel_uranium
+                    self.uranium -= delivery_uranium
+                    rocket.uranium_cargo += delivery_uranium
                     self.fuel -= delivery_fuel
                     rocket.fuel_cargo += delivery_fuel
 
@@ -102,15 +103,15 @@ class SpaceBase(Thread):
                 else:
                     lua = globals.get_bases_ref().get('moon')
                     delivery_fuel = 30000 - lua.fuel
-                    refuel_uranium = 150 - lua.uranium
+                    delivery_uranium = 150 - lua.uranium
                     
                     if delivery_fuel >= 120:
                         delivery_fuel = 120
-                    if  refuel_uranium >= 75:
-                        refuel_uranium = 75
+                    if  delivery_uranium >= 75:
+                        delivery_uranium = 75
                         
-                    self.uranium -= refuel_uranium
-                    rocket.uranium_cargo += refuel_uranium
+                    self.uranium -= delivery_uranium
+                    rocket.uranium_cargo += delivery_uranium
                     self.fuel -= delivery_fuel
                     rocket.fuel_cargo += delivery_fuel
                     
@@ -242,7 +243,10 @@ class SpaceBase(Thread):
                     
                     # Se target_planet não estiver disponível, não realiza o lançamento
                     if target_planet == False:
-                        pass
+
+                        if len(self.rockets) == self.constraints[2] and globals.finalize_threads == False:
+                            with globals.stop_bases:
+                                globals.stop_bases.wait()
         
                     # Realiza lançamento
                     else:

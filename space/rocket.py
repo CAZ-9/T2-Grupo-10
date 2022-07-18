@@ -60,8 +60,10 @@ class Rocket:
         # colidiu, libera para um novo lançamento
         globals.voyage_to.get(planet.name).release()
         # Impede busywaiting nas bases
+        with globals.stop_bases:
+            globals.stop_bases.notify_all()
         #TODO verificar dps 
-        globals.no_more_busywating.release()
+       
         
 
     def voyage(self, planet):  # Permitida a alteração (com ressalvas)
@@ -80,8 +82,9 @@ class Rocket:
         # Libera para novo lançamento caso o foguete falhe
         else:
             # Impede busywaiting nas bases
-            #TODO verificar dps 
-            globals.no_more_busywating.release()
+            #TODO verificar dps
+            with globals.stop_bases:
+                globals.stop_bases.notify_all() 
             globals.voyage_to.get(planet.name).release()
             
 
@@ -99,10 +102,10 @@ class Rocket:
         to_define_destiny_dict = globals.voyage_to 
         
         # TODO if globals.no_more_busywating._value == 0 and len(self.rockets) == self.constraints[2]
-        globals.no_more_busywating.acquire()    # Impede busywating das bases
+        #globals.no_more_busywating.acquire()    # Impede busywating das bases
         
-        if globals.finalize_threads == True:
-            return False
+        #if globals.finalize_threads == True:
+            #return False
         
         if to_define_destiny_dict.get('MARS').acquire(blocking=False): 
             planet = globals.get_planets_ref().get('mars')
@@ -185,6 +188,7 @@ class Rocket:
         
         # caso falhe o lançamento, libera um novo lançamento
         else:
-            globals.no_more_busywating.release()
+            with globals.stop_bases:
+                globals.stop_bases.notify()
             globals.voyage_to.get(planet.name).release()
             

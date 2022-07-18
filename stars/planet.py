@@ -71,11 +71,14 @@ class Planet(Thread):
         if (planets.get('mars').satellite_get_info() < 0 and planets.get('io').satellite_get_info() < 0
             and planets.get('ganimedes').satellite_get_info() < 0 and planets.get('europa').satellite_get_info() < 0):
             
-            globals.finalize_threads = True # Seta True para finalizar bases,time e mines
-            globals.no_more_busywating.release(4) # Garante que bases vão finalizar
-            
-            with globals.moon_wait:
-                globals.moon_wait.notify() # Garante que lua vai finalizar
+            globals.finalize_threads = True # Seta True para finalizar bases, time e mines
+                
+            while active_count() > 2:
+                with globals.stop_bases:
+                    globals.stop_bases.notify_all() # Garante que bases vão finalizar
+                with globals.moon_wait:
+                    globals.moon_wait.notify() # Garante que lua vai finalizar
+                sleep(1)
             
             globals.acquire_print()
             print(f'\033[1;31mAll planets terraformed in {time} years\033[m')

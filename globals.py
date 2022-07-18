@@ -54,7 +54,8 @@ colision_course_europa = Semaphore(2)
 europa_north_pole = Lock()
 
 # Caso foguetes não possam mais ser lançados para nenhum planeta, as threads travam nesse semáforo
-no_more_busywating = Semaphore(N*4) # Impede busywaiting das bases
+stop_bases = Condition()
+# no_more_busywating = Semaphore(N*4) # Impede busywaiting das bases
 
 # * Sincronização de planetas
 
@@ -114,7 +115,7 @@ voyage_to = {
 
 # * Sincronização das minas
 
-''' ### Locks "nomedamina_units" protegem o acesso a região cŕitica da variável mina.units
+''' ### Locks "nomedamina_units" protegem o acesso a região crítica da variável mina.units
     ### Semáforos available_mina definem que uma porção de recurso pode ser pego por uma das bases'''
 
 pipeline_units = Lock()
