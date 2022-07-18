@@ -132,15 +132,18 @@ class SpaceBase(Thread):
             # Decrementa para sinalizar que pegou uma porção de óleo
             globals.available_oil.acquire()
             
-            self.fuel += 17  # Incrementa próprio óleo
+            # Se o programa pede para finalizar, não coleta mais recurso
+            if globals.finalize_threads == False:
             
-            with globals.pipeline_units:  # Protege acesso a Pipeline.units !! Região crítica !!
-                globals.get_mines_ref().get('oil_earth').unities -= 17  # Decrementa óleo da mina
+                self.fuel += 17  # Incrementa próprio óleo
                 
-            globals.acquire_print()
-            print(f'🔭 - [{self.name}] → refueling 17 ⛽')
-            self.print_space_base_info()
-            globals.release_print()
+                with globals.pipeline_units:  # Protege acesso a Pipeline.units !! Região crítica !!
+                    globals.get_mines_ref().get('oil_earth').unities -= 17  # Decrementa óleo da mina
+                    
+                globals.acquire_print()
+                print(f'🔭 - [{self.name}] → refueling 17 ⛽')
+                self.print_space_base_info()
+                globals.release_print()
 
 
     def refuel_uranium(self):
@@ -151,15 +154,18 @@ class SpaceBase(Thread):
             # Decrementa para sinalizar que pegou uma porção de urânio
             globals.available_uranium.acquire()
             
-            self.uranium += 15  # Incrementa próprio urânio
+            # Se o programa pede para finalizar, não coleta mais recurso
+            if globals.finalize_threads == False:
             
-            with globals.store_house_units:  # Protege acesso a StoreHouse.units !! Região crítica !!
-                globals.get_mines_ref().get('uranium_earth').unities -= 15 # Decrementa urânio da mina
+                self.uranium += 15  # Incrementa próprio urânio
                 
-            globals.acquire_print()
-            print(f'🔭 - [{self.name}] → refueling 15 ☢')
-            self.print_space_base_info()
-            globals.release_print()
+                with globals.store_house_units:  # Protege acesso a StoreHouse.units !! Região crítica !!
+                    globals.get_mines_ref().get('uranium_earth').unities -= 15 # Decrementa urânio da mina
+                    
+                globals.acquire_print()
+                print(f'🔭 - [{self.name}] → refueling 15 ☢')
+                self.print_space_base_info()
+                globals.release_print()
 
     
     def run(self):
@@ -199,10 +205,12 @@ class SpaceBase(Thread):
 
                 # Construir lion se tem recurso e se MOON solicita
                 if (self.name != 'MOON' and self.uranium >= 75 and self.fuel >= 235 and globals.moon_request_lion_launch.acquire(blocking=False)):
+                    
                     # Libera para outras bases voltarem a construir foguete FALCON ou DRAGON
                     globals.next_will_be_lion.release()
+                    
+                    # Constrói LION
                     self.try_to_build_rocket('LION')
-
                 
                 # Se lua não necessita de lion tenta construir FALCON ou DRAGON
                 if globals.next_will_be_lion.locked() == False:
@@ -244,7 +252,8 @@ class SpaceBase(Thread):
                     # Se target_planet não estiver disponível, não realiza o lançamento
                     if target_planet == False:
 
-                        if len(self.rockets) == self.constraints[2] and globals.finalize_threads == False:
+                        # Se armazenamento de foguetes cheio 
+                        if len(self.rockets) == self.constraints[2]:
                             with globals.stop_bases:
                                 globals.stop_bases.wait()
         

@@ -10,11 +10,11 @@ class Planet(Thread):
     ################################################
     def __init__(self, terraform, name):
         Thread.__init__(self)
-        self.terraform = terraform
+        self.terraform = terraform # ! Região crítica
         self.name = name
 
     def nuke_detected(self):
-        '''Aguarda detecção de nuke enquanto o planeta for inabitável. Quando há detecção, imprime self.terraform'''
+        '''Aguarda detecção de nuke. Enquanto o planeta for inabitável, quando há detecção, imprime self.terraform'''
         
         planet_condition = globals.nuclear_event_condition.get(self.name)
         
@@ -32,18 +32,19 @@ class Planet(Thread):
         print(f"🪐 - [{self.name}] → {self.terraform}% UNINHABITABLE")
 
     def satellite_get_info(self):
+        '''  Cada planeta possui um satélite orbitando-o e enviando dados aos cientistas.
+             Não é possível duas bases consultarem os dados de um planeta ao mesmo tempo'''
         
-        '''Limitação da tecnologia, um acesso por vez'''
-        
+        # Satisfaz a regra de uma thread por vez solicitando informação do satélite
         with globals.satellite_lock.get(self.name):
             info = self.terraform
         return info
 
     def planet_takes_damage(self, damage):
         '''Decrementa a vida do planeta'''
-      
-        with globals.satellite_lock.get(self.name):
-            self.terraform = self.terraform - damage
+        
+        with globals.satellite_lock.get(self.name): # Protege self.terraform ## Região Crítica ##
+            self.terraform = self.terraform - damage # Decrementa vida
 
     def run(self):
         globals.acquire_print()
@@ -58,7 +59,8 @@ class Planet(Thread):
             self.nuke_detected() # Fica em laço até o planeta ser terraformado
             break 
         
-        globals.colision_course.get(self.name).release(10) # Deixa threads de foguetes presos no semaforo finalizarem
+        # 10 é o número maximo de threads que podem estar esperando nesse semáforo
+        globals.colision_course.get(self.name).release(10) # Faz com que threads de foguetes presos no semaforo finalizam
         
         planets = globals.get_planets_ref()    
         time = globals.get_simulation_time().simulation_time()
@@ -72,8 +74,12 @@ class Planet(Thread):
             and planets.get('ganimedes').satellite_get_info() < 0 and planets.get('europa').satellite_get_info() < 0):
             
             globals.finalize_threads = True # Seta True para finalizar bases, time e mines
+            
+            # Garante que bases vão finalizar
+            globals.available_oil.release(4)
+            globals.available_uranium.release(4)
                 
-            while active_count() > 2: # Se existem além de MainThread e a última thread planeta ativa
+            while active_count() > 2: # Enquanto existem threads além de MainThread e a última thread planeta ativa
                 with globals.stop_bases:
                     globals.stop_bases.notify_all() # Garante que bases vão finalizar
                 with globals.moon_wait:

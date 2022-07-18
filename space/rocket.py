@@ -34,8 +34,9 @@ class Rocket:
             globals.release_print()
 
     def nuke(self, planet):  # Permitida a alteração
-        ''' Satisfaz a regra de não haver colisão simultânea no mesmo polo'''
+        '''# BOOM!!! 🎇'''
 
+        # Satisfaz a regra de não haver colisão simultânea no mesmo polo
         if globals.pole.get(planet.name).acquire(blocking=False):
 
             globals.acquire_print()
@@ -59,12 +60,10 @@ class Rocket:
         globals.colision_course.get(planet.name).release()
         # colidiu, libera para um novo lançamento
         globals.voyage_to.get(planet.name).release()
-        # Impede busywaiting nas bases
+        
+        # Notifica o condition que impede busy waiting nas bases
         with globals.stop_bases:
             globals.stop_bases.notify_all()
-        #TODO verificar dps, esse comentário ta mal explicado, como nos outros trechos assim. Bora colocar isso numa função? 
-       
-        
 
     def voyage(self, planet):  # Permitida a alteração (com ressalvas)
 
@@ -90,27 +89,14 @@ class Rocket:
 
     def planning_launch(self):
         '''Retorna o planeta que o foguete deve viajar, retorna falso se nenhum estiver disponível'''
-        # Semáforos de valor N
-        # Se < 0 decrementa, mas não bloqueia
-
-        # Cada planeta possui um satélite orbitando-o e enviando dados aos cientistas.
-        # Não é possível duas bases consultarem os dados de um planeta ao mesmo tempo
-            
+        
         # Dicionario com semaforos que contam 100 lançamentos para um planeta simultaneamente
         to_define_destiny_dict = globals.voyage_to 
         
-        #! Acho que isso só saí
-        # TODO if globals.no_more_busywating._value == 0 and len(self.rockets) == self.constraints[2]
-        #globals.no_more_busywating.acquire()    # Impede busywating das bases
-        #if globals.finalize_threads == True:
-            #return False
-        #! até aqui, pois esse controle agora rola em bases
+        # Semáforos de valor N
+        # Se > 0, decrementa, mas não bloqueia
         
-        if to_define_destiny_dict.get('MARS').acquire(blocking=False): 
-            planet = globals.get_planets_ref().get('mars')
-            return planet
-
-        elif to_define_destiny_dict.get('IO').acquire(blocking=False): 
+        if to_define_destiny_dict.get('IO').acquire(blocking=False): 
             planet = globals.get_planets_ref().get('io')
             return planet
 
@@ -122,11 +108,17 @@ class Rocket:
             planet = globals.get_planets_ref().get('europa')
             return planet
 
+        elif to_define_destiny_dict.get('MARS').acquire(blocking=False): 
+            planet = globals.get_planets_ref().get('mars')
+            return planet
+        
         else:
             return False
 
     def lion_launch(self):
-
+        
+        '''Lançamento de lion'''
+        
         sleep(0.01)  # Quatro dias para o foguete LION chegar na lua
         lua = globals.get_bases_ref().get('moon')
 
@@ -185,9 +177,11 @@ class Rocket:
             print(f"🚀 - [{self.name} - {self.id}] launched from [{base.name}].")
             self.voyage(planet)
         
-        # caso falhe o lançamento, libera um novo lançamento
+        # caso falhe o lançamento
         else:
+            # Da notify para as bases que estão aguardando em stop_bases.wait()
             with globals.stop_bases:
                 globals.stop_bases.notify()
+            # Da release para liberar novo lançamento para o planeta associado
             globals.voyage_to.get(planet.name).release()
             

@@ -15,7 +15,7 @@ class StoreHouse(Thread):
 
     def __init__(self, unities, location, constraint):
         Thread.__init__(self)
-        self.unities = unities  # ! Região crítica, podemos ter valores errados
+        self.unities = unities  # ! Região crítica
         self.location = location
         self.constraint = constraint
 
@@ -42,5 +42,7 @@ class StoreHouse(Thread):
         
         while(True):
             self.produce()
+            
+            # Se True, finaliza thread
             if globals.finalize_threads == True:
                 break    

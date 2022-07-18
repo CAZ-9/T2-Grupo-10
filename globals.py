@@ -35,7 +35,7 @@ next_will_be_lion = Lock()  # Lua da lock para garantir que LION será construid
     ### Locks "nomedoplaneta_north_pole" lockam a colisão com o polo norte do planeta
     ### Locks "nomedoplaneta_north_pole" satisfazem a regra de 2 foguetes não baterem no mesmo polo simultâneamente'''
 
-N = 10 # Quantos foguetes podem estar em rota para um planeta e orbitando o mesmo ## Limitador de threads do SO # #
+N = 10 # Quantos foguetes podem estar em rota para um planeta e orbitando o mesmo ## Limitador de threads do SO ##
 
 voyage_to_mars = Semaphore(N) 
 colision_course_mars = Semaphore(2)  
@@ -53,7 +53,8 @@ voyage_to_europa = Semaphore(N)
 colision_course_europa = Semaphore(2)
 europa_north_pole = Lock()
 
-# Caso foguetes não possam mais ser lançados para nenhum planeta, as threads travam nesse semáforo
+''' Caso as bases não possam mais lançar foguetes para nenhum planeta e nem construí-los, 
+travam nesse condition, impedindo busywating'''
 stop_bases = Condition()
 
 
