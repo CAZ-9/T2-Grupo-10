@@ -24,63 +24,59 @@ moon_request_lion_launch = Semaphore(0) # Lua da release para solicitar foguete 
 moon_wait = Condition()  # Lua aguarda recursos
 next_will_be_lion = Lock()  # Lua da lock para garantir que LION será construido
 
-'''alredy_asked = False  # Impede lua de pedir foguetes caso já tenha pedido
-lock_lion_launch = Lock()  # Impede deadlock na lua
 
-need_notify = Lock() # Gerencia se lua precisa de notify quando recursos chegarem
-moon_constraints = Lock() # Protege região critica dos recurso da lua
-send_next_to_moon = Lock() # Garante que o foguete para lua será enviado'''
-N = 10
+
 # * Sincronização para as viagens
-# Garante que apenas N foguetes estejam em rota para Marte
-voyage_to_mars = Semaphore(N)  # Sincronização para órbita
-colision_course_mars = Semaphore(2)  # No máximo 2 em rota de colisão
-# Se lock estiver travado rota para o polo sul
-mars_north_pole = Lock()  # Bloqueia ao colidir com polo norte
-# é liberado pela colisão com o polo sul
 
-# Garante que apenas N foguetes estejam em rota para Io
-voyage_to_io = Semaphore(N)  # Sincronização para órbita
-colision_course_io = Semaphore(2)  # No máximo 2 em rota de colisão
-# Se lock estiver travado rota para o polo sul
-io_north_pole = Lock()  # Bloqueia ao colidir com polo norte
-# é liberado pela colisão com o polo sul
+''' ### Semáforos "voyage_to_nomedoplaneta" definem quantos lançamentos podem ser feitos para o planeta em questão
+    ### Semáforos "voyage_to_nomedoplaneta" também definem quantos foguetes ficam orbitando o planeta
+    ### Semáforos "voyage_to_nomedoplaneta" servem para não ter threads demais no SO
+    ### Semáforos collision_course_nomedoplaneta definem dois foguetes em rota de colisão com o planete por vez
+    ### Locks "nomedoplaneta_north_pole" lockam a colisão com o polo norte do planeta
+    ### Locks "nomedoplaneta_north_pole" satisfazem a regra de 2 foguetes não baterem no mesmo polo simultâneamente'''
 
-# Garante que apenas N foguetes estejam em rota para Ganimedes
+N = 10 # Quantos foguetes podem estar em rota para um planeta e orbitando o mesmo ## Limitador de threads do SO # #
+
+voyage_to_mars = Semaphore(N) 
+colision_course_mars = Semaphore(2)  
+mars_north_pole = Lock()  
+
+voyage_to_io = Semaphore(N)  
+colision_course_io = Semaphore(2)  
+io_north_pole = Lock()  
+
 voyage_to_ganimedes = Semaphore(N)
-colision_course_ganimedes = Semaphore(2)  # No máximo 2 em rota de colisão
-# Se lock estiver travado rota para o polo sul
-ganimedes_north_pole = Lock()  # Bloqueia ao colidir com polo norte
-# é liberado pela colisão com o polo sul
+colision_course_ganimedes = Semaphore(2)  
+ganimedes_north_pole = Lock()
 
-# Garante que apenas N foguetes estejam em rota para Europa
-voyage_to_europa = Semaphore(N)  # Sincronização para órbita
-colision_course_europa = Semaphore(2)  # No máximo 2 em rota de colisão
-# Se lock estiver travado rota para o polo sul
-europa_north_pole = Lock()  # Bloqueia ao colidir com polo norte
-# é liberado pela colisão com o polo sul
+voyage_to_europa = Semaphore(N)  
+colision_course_europa = Semaphore(2)
+europa_north_pole = Lock()
 
+# Caso foguetes não possam mais ser lançados para nenhum planeta, as threads travam nesse semáforo
 no_more_busywating = Semaphore(N*4) # Impede busywaiting das bases
 
 # * Sincronização de planetas
+
+''' ### Conditions "explosion_nomedoplaneta" não deixa os planetas ficarem em busywaiting
+    ### Seram noticadas quando uma nuke explodir no planeta'''
+    
 explosion_mars = Condition()
 explosion_io = Condition()
 explosion_ganimedes = Condition()
 explosion_europa = Condition()
 
-# Define se o planeta precisa de um notify
-'''can_i_notify_mars = Lock()
-can_i_notify_io = Lock()
-can_i_notify_ganimedes = Lock()
-can_i_notify_europa = Lock()'''
-
-# Como descrito no enunciado, a inabitabilidade, fornecida pelo satelite, só pode ser verificada por uma base de cada vez
+''' ### Como descrito no enunciado, a inabitabilidade, fornecida pelo satelite, só pode ser verificada por uma base de cada vez
+    ### Locks "nomedoplaneta_satellite" satisfazem a regra de uma thread verificar o satelite do planeta por vez'''
+    
 mars_satellite = Lock()
 io_satellite = Lock()
 ganimedes_satellite = Lock()
 europa_satellite = Lock()
 
-# * Sincronização para colisão
+'''### Colocado semaforos e locks em dicionários para acesso a partida planet.name
+   ### Não colocamos os semaforos e locks no construtor da classe pois era proibido modificação do construtor'''
+ 
 colision_course = {
     'MARS': colision_course_mars,
     'IO': colision_course_io,
@@ -114,43 +110,18 @@ voyage_to = {
     'GANIMEDES': voyage_to_ganimedes,
     'EUROPA': voyage_to_europa
 }
-'''can_i_notify = {
-    'MARS': can_i_notify_mars,
-    'IO': can_i_notify_io,
-    'GANIMEDES': can_i_notify_ganimedes,
-    'EUROPA': can_i_notify_europa
-}'''
 
-#! Variar para testar desempenho:
-oil_units = 17       # Valor base para receber oil
-uranium_units = 35  # Valor base de urânio para 1 foguete
 
-# Deveria estar no construtor de cada mina:
-#! Devem ser atualizados quando o recurso for decrementado da base
-uranium_loads = 0   # Variável que diz para a mina quanto urânio tinha
-oil_loads = 0       # Variável que diz para a mina quanto oil tinha
+# * Sincronização das minas
 
-# * Sincronização para abastecimento das bases:
+''' ### Locks "nomedamina_units" protegem o acesso a região cŕitica da variável mina.units
+    ### Semáforos available_mina definem que uma porção de recurso pode ser pego por uma das bases'''
 
-# Protege a região critica Pipeline.unities:
 pipeline_units = Lock()
-# Quantas unidades de óleo estão disponíveis?
 available_oil = Semaphore(0)
-# Faz dois consumidores não acessarem a região crítica
-pipeline_consumidor = Lock()  # TODO verificar se usa em bases se não, REMOVER
-# Condition para consumir oil
-# TODO verificar se usa em bases se não, REMOVER
-pipeline_itens = Condition(pipeline_units)
 
-# Protege a região critica StoreHouse.unities:
 store_house_units = Lock()
-# Quantas unidades de urânio estão disponíveis?
 available_uranium = Semaphore(0)
-# Faz dois consumidores não acessarem a região crítica:
-store_house_consumidor = Lock()  # TODO verificar se usa em bases se não, REMOVER
-# Condition para consumir
-# TODO verificar se usa em bases se não, REMOVER
-store_house_itens = Condition(store_house_units)
 
 
 def acquire_print():
@@ -213,26 +184,3 @@ def get_simulation_time():
     return simulation_time
 
 
-# * Funções para as minas:
-
-# Devia ser um método da classe minas
-def delivery_control(unities, units_ready, global_material_loads, semaphore):
-    '''Executa N° releases em semaphore, com base em N° envios possíveis de carga
-    @param int unities: self.unities
-    @param units_ready: Variável para armazenar int de n unidades prontas
-    @param global_material_loads: Variável global para armazenar int de cargas de material
-    @param semaphore: Semáforo global para controlar
-    '''
-
-    # Faz a divisão inteira, possuí "x" units_ready
-    current_loads = unities // units_ready
-    # Tenho um número de cargas igual ou maior que antes?
-    if current_loads >= global_material_loads:
-        n = current_loads - global_material_loads   # Diferença entre as cargas
-        global_material_loads += n                  # incremento minhas cargas
-        #! É nescessário decrementar esse valor a cada x_loads removidos
-        # Tenho n cargas disponíveis!
-        #!semaphore.release(n)
-        # TypeError: SemLock.release() takes no arguments (1 given)
-        for i in range(0, n):
-            semaphore.release()
