@@ -32,23 +32,26 @@ class Rocket:
             globals.release_print()
 
     def nuke(self, planet):  # Permitida a alteração
-
+    
         if globals.pole.get(planet.name).acquire(blocking=False):
             globals.acquire_print()
             print(f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on North Pole!")
             globals.release_print()
+            planet.planet_takes_damage(self.damage())
+            globals.pole.get(planet.name).release()
 
         else:
             globals.acquire_print()
             print(f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on South Pole!")
             globals.release_print()
-            globals.pole.get(planet.name).release()  # Intercalando a colisão
+            planet.planet_takes_damage(self.damage())
+              # Intercalando a colisão'''
 
         #! e se o notify, que da release no lock associado, impedir que ocorra outra explosão, até saber a atual vida
         #! até que seja indentificada a explosão pelo planeta
 
         # Decrementa 'damage' da vida do planeta: #! Talvez careça de mutex, caso a inabitabilidade seja uma região crítica
-        planet.planet_takes_damage(self.damage())
+        
 
         # Dispara condição para acordar o planeta:
 

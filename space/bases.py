@@ -300,7 +300,7 @@ class SpaceBase(Thread):
                     globals.acquire_print()
                     print(f'🔭 - [{self.name}] → launching LION rocket  🌍🚀🦁')
                     globals.release_print()
-                    rocket = Thread(target=lion.lion_launch)
+                    rocket = Thread(target=lion.lion_launch,name='LION')
                     launch_lion = False
                     rocket.start()
 
@@ -319,7 +319,7 @@ class SpaceBase(Thread):
                     else:
                         # TODO Criar thread do foguete e Chama função de lançamento
                         rocket_thread = Thread(
-                            name=choiced_to_launch.id, target=choiced_to_launch.launch, args=(self, target_planet))
+                            name=str(choiced_to_launch.name+str(choiced_to_launch.id)), target=choiced_to_launch.launch, args=(self, target_planet))
                         rocket_thread.start()  # Starta a thread
                         self.rockets.remove(choiced_to_launch)
             

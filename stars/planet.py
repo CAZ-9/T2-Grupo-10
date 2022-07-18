@@ -79,15 +79,13 @@ class Planet(Thread):
             and planets.get('ganimedes').satellite_get_info() < 0 and planets.get('europa').satellite_get_info() < 0):
             globals.finalize_threads = True
             globals.no_more_busywating.release(4)
+            with globals.moon_wait:
+                globals.moon_wait.notify()
             globals.acquire_print()
-            print(f'All planets terraformed in {time} years')
+            print(f'\033[1;31mAll planets terraformed in {time} years\033[m')
             globals.release_print()
-            while True:
-                print(active_count())
-                sleep(2)
-                if active_count == 1:
-                    break
-            
+            print('\033[1;31mFINALIZOU CARALHO\033[m🚀🎇🚀🎇🚀🎇🚀🎇🚀🎇🚀🎇🚀🎇')
+        
                 
             
             
