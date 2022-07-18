@@ -75,10 +75,10 @@ can_i_notify_ganimedes = Lock()
 can_i_notify_europa = Lock()'''
 
 # Como descrito no enunciado, a inabitabilidade, fornecida pelo satelite, só pode ser verificada por uma base de cada vez
-mars_satelite = Lock()
-io_satelite = Lock()
-ganimedes_satelite = Lock()
-europa_satelite = Lock()
+mars_satellite = Lock()
+io_satellite = Lock()
+ganimedes_satellite = Lock()
+europa_satellite = Lock()
 
 # * Sincronização para colisão
 colision_course = {
@@ -102,10 +102,10 @@ nuclear_event_condition = {
 }
 
 satellite_lock = {
-    'MARS': mars_satelite,
-    'IO': io_satelite,
-    'GANIMEDES': ganimedes_satelite,
-    'EUROPA': europa_satelite
+    'MARS': mars_satellite,
+    'IO': io_satellite,
+    'GANIMEDES': ganimedes_satellite,
+    'EUROPA': europa_satellite
 }
 
 voyage_to = {

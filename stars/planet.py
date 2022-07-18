@@ -16,11 +16,11 @@ class Planet(Thread):
     def nuke_detected(self):
         planet_condition = globals.nuclear_event_condition.get(self.name)
         
-        while(self.terraform > 0):
+        while(self.satellite_get_info() > 0):
             '''before_percentage = self.terraform
             while(before_percentage == self.terraform):
                 pass'''
-                
+                #!
             with planet_condition:
                 planet_condition.wait() # Impede busywaiting nos planetas
                  
@@ -40,7 +40,8 @@ class Planet(Thread):
         '''Decrementa a vida do planeta'''
         # TODO proteger variável self.terraform
         #! self.terraform é uma região crítica? Se for deve ser protegido aqui e em satélite
-        self.terraform = self.terraform - damage
+        with globals.satellite_lock.get(self.name):
+            self.terraform = self.terraform - damage
 
     def run(self):
         globals.acquire_print()
@@ -74,8 +75,8 @@ class Planet(Thread):
         print(f'🪐 - [{self.name}] - Terraform completed in {time} years')
         globals.release_print()
         
-        if (planets.get('mars').terraform < 0 and planets.get('io').terraform < 0
-            and planets.get('ganimedes').terraform < 0 and planets.get('europa').terraform < 0):
+        if (planets.get('mars').satellite_get_info() < 0 and planets.get('io').satellite_get_info() < 0
+            and planets.get('ganimedes').satellite_get_info() < 0 and planets.get('europa').satellite_get_info() < 0):
             globals.finalize_threads = True
             globals.no_more_busywating.release(4)
             globals.acquire_print()
