@@ -28,5 +28,7 @@ class SimulationTime(Thread):
             print(f"{self.current_time} year(s) have passed...")
             self.current_time += 1
             sleep(1)
+            
+            # Se true, finaliza thread
             if globals.finalize_threads == True:
                 break

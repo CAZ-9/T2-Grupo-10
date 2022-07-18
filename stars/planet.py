@@ -14,9 +14,11 @@ class Planet(Thread):
         self.name = name
 
     def nuke_detected(self):
-        '''Aguarda detecção de nuke, enquanto o planeta for inabitável. Quando ha detecção imprime self.terraform'''
+        '''Aguarda detecção de nuke enquanto o planeta for inabitável. Quando há detecção, imprime self.terraform'''
+        
         planet_condition = globals.nuclear_event_condition.get(self.name)
         
+        # Verifica se self.terraform > 0
         while(self.satellite_get_info() > 0):
             
             with planet_condition:
@@ -30,15 +32,16 @@ class Planet(Thread):
         print(f"🪐 - [{self.name}] → {self.terraform}% UNINHABITABLE")
 
     def satellite_get_info(self):
+        
         '''Limitação da tecnologia, um acesso por vez'''
+        
         with globals.satellite_lock.get(self.name):
             info = self.terraform
         return info
 
     def planet_takes_damage(self, damage):
         '''Decrementa a vida do planeta'''
-        # TODO proteger variável self.terraform
-        #! self.terraform é uma região crítica? Se for deve ser protegido aqui e em satélite
+      
         with globals.satellite_lock.get(self.name):
             self.terraform = self.terraform - damage
 
@@ -46,44 +49,38 @@ class Planet(Thread):
         globals.acquire_print()
         self.print_planet_info()
         globals.release_print()
-        #! Dar aquire nos locks antes
-        # Quando iniciar a execução, da aquire no lock da condition
-        # globals.nuclear_event.get(self.name).acquire()
 
         while(globals.get_release_system() == False):
             pass
 
         while(True):
-            # TODO quando essa thread fica em wait, a velocidade dos prints aumenta muito!
-            #! por ficar ociosa acho que está fazendo bases rodar em loop
-
-            # * Aguarda o notify de rockets.nuke()
-            # Por estar comentada recebemos o erro de cant notify an unaquired lock
-            # TODO descomentar abaixo, e refletir se vale mesmo a pena acabar com o busy wait de todos os planetas
-            # globals.nuclear_event_condition.get(self.name).wait()
-            self.nuke_detected()       # Printa após atualizar satellite
             
+            self.nuke_detected() # Fica em laço até o planeta ser terraformado
             break 
         
-        globals.colision_course.get(self.name).release(10)
-        planets = globals.get_planets_ref()    
+        globals.colision_course.get(self.name).release(10) # Deixa threads de foguetes presos no semaforo finalizarem
         
+        planets = globals.get_planets_ref()    
         time = globals.get_simulation_time().simulation_time()
         
         globals.acquire_print()
         print(f'🪐 - [{self.name}] - Terraform completed in {time} years')
         globals.release_print()
         
+        # Verifica se todos planetas foram terraformados
         if (planets.get('mars').satellite_get_info() < 0 and planets.get('io').satellite_get_info() < 0
             and planets.get('ganimedes').satellite_get_info() < 0 and planets.get('europa').satellite_get_info() < 0):
-            globals.finalize_threads = True
-            globals.no_more_busywating.release(4)
+            
+            globals.finalize_threads = True # Seta True para finalizar bases,time e mines
+            globals.no_more_busywating.release(4) # Garante que bases vão finalizar
+            
             with globals.moon_wait:
-                globals.moon_wait.notify()
+                globals.moon_wait.notify() # Garante que lua vai finalizar
+            
             globals.acquire_print()
             print(f'\033[1;31mAll planets terraformed in {time} years\033[m')
             globals.release_print()
-            print('\033[1;31mFINALIZOU CARALHO\033[m🚀🎇🚀🎇🚀🎇🚀🎇🚀🎇🚀🎇🚀🎇')
+            
         
                 
             

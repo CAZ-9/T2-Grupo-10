@@ -18,7 +18,7 @@ class Rocket:
 
     def orbit(self, planet):
         '''Seguindo a informação do satélite, se o planeta for inabitável permite a rota de colisão.
-        Caso contrário, a thread foguete chega ao sem fim após printar'''
+        Caso contrário, a thread foguete chega ao seu fim após printar'''
         
         # Satisfaz a regra que apenas 2 foguetes por vez podem colidir com o planeta
         globals.colision_course.get(planet.name).acquire() 
