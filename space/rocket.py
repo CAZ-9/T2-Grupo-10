@@ -20,9 +20,8 @@ class Rocket:
         '''Se o planeta for inabitável, após a confirmação do satélite, permite a rota de colisão.
         Caso contrário, a thread chega ao sem fim após printar'''
         
-        
-        globals.colision_course.get(planet.name).acquire() # Aguarda para colisão
-        
+        globals.colision_course.get(planet.name).acquire() # Aguarda para colisão no máximo 2 de cada vez
+
         # retorna inabitabilidade. Se planeta habitável, foguete não colide  ## só pode fornecer isso a uma base de cada vez ##
         if planet.satellite_get_info() > 0:  # Se não está habitável
             self.nuke(planet) # bombardeia o planeta

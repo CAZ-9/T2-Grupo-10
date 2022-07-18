@@ -37,6 +37,7 @@ voyage_to_mars = Semaphore(N)  # Sincronização para órbita
 colision_course_mars = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
 mars_north_pole = Lock()  # Bloqueia ao colidir com polo norte
+mars_south_pole = Lock()
 # é liberado pela colisão com o polo sul
 
 # Garante que apenas N foguetes estejam em rota para Io
@@ -44,6 +45,7 @@ voyage_to_io = Semaphore(N)  # Sincronização para órbita
 colision_course_io = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
 io_north_pole = Lock()  # Bloqueia ao colidir com polo norte
+io_south_pole = Lock()
 # é liberado pela colisão com o polo sul
 
 # Garante que apenas N foguetes estejam em rota para Ganimedes
@@ -51,6 +53,7 @@ voyage_to_ganimedes = Semaphore(N)
 colision_course_ganimedes = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
 ganimedes_north_pole = Lock()  # Bloqueia ao colidir com polo norte
+ganimedes_south_pole = Lock()
 # é liberado pela colisão com o polo sul
 
 # Garante que apenas N foguetes estejam em rota para Europa
@@ -58,6 +61,7 @@ voyage_to_europa = Semaphore(N)  # Sincronização para órbita
 colision_course_europa = Semaphore(2)  # No máximo 2 em rota de colisão
 # Se lock estiver travado rota para o polo sul
 europa_north_pole = Lock()  # Bloqueia ao colidir com polo norte
+europa_south_pole = Lock()
 # é liberado pela colisão com o polo sul
 
 no_more_busywating = Semaphore(N*4) # Impede busywaiting das bases
@@ -87,11 +91,18 @@ colision_course = {
     'GANIMEDES': colision_course_ganimedes,
     'EUROPA': colision_course_europa
 }
-pole = {
+north_pole = {
     'MARS': mars_north_pole,
     'IO': io_north_pole,
     'GANIMEDES': ganimedes_north_pole,
     'EUROPA': europa_north_pole
+}
+
+south_pole = {
+    'MARS': mars_south_pole,
+    'IO': io_south_pole,
+    'GANIMEDES': ganimedes_south_pole,
+    'EUROPA': europa_south_pole
 }
 
 nuclear_event_condition = {
