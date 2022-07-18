@@ -14,13 +14,11 @@ class Planet(Thread):
         self.name = name
 
     def nuke_detected(self):
+        '''Aguarda detecção de nuke, enquanto o planeta for inabitável. Quando ha detecção imprime self.terraform'''
         planet_condition = globals.nuclear_event_condition.get(self.name)
         
         while(self.satellite_get_info() > 0):
-            '''before_percentage = self.terraform
-            while(before_percentage == self.terraform):
-                pass'''
-                #!
+            
             with planet_condition:
                 planet_condition.wait() # Impede busywaiting nos planetas
                  
@@ -31,7 +29,8 @@ class Planet(Thread):
     def print_planet_info(self):
         print(f"🪐 - [{self.name}] → {self.terraform}% UNINHABITABLE")
 
-    def satellite_get_info(self):  # * Limitação da tecnologia, um acesso por vez
+    def satellite_get_info(self):
+        '''Limitação da tecnologia, um acesso por vez'''
         with globals.satellite_lock.get(self.name):
             info = self.terraform
         return info
