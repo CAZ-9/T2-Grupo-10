@@ -62,7 +62,7 @@ class Rocket:
         # Impede busywaiting nas bases
         with globals.stop_bases:
             globals.stop_bases.notify_all()
-        #TODO verificar dps 
+        #TODO verificar dps, esse comentário ta mal explicado, como nos outros trechos assim. Bora colocar isso numa função? 
        
         
 
@@ -82,30 +82,29 @@ class Rocket:
         # Libera para novo lançamento caso o foguete falhe
         else:
             # Impede busywaiting nas bases
-            #TODO verificar dps
+            #TODO verificar dps, rever porque é notify all
             with globals.stop_bases:
                 globals.stop_bases.notify_all() 
             globals.voyage_to.get(planet.name).release()
             
 
     def planning_launch(self):
-        #TODO 
         '''Retorna o planeta que o foguete deve viajar, retorna falso se nenhum estiver disponível'''
         # Semáforos de valor N
         # Se < 0 decrementa, mas não bloqueia
 
-        # TODO planetas que foram terraformados devem parar de ser opções
         # Cada planeta possui um satélite orbitando-o e enviando dados aos cientistas.
         # Não é possível duas bases consultarem os dados de um planeta ao mesmo tempo
             
         # Dicionario com semaforos que contam 100 lançamentos para um planeta simultaneamente
         to_define_destiny_dict = globals.voyage_to 
         
+        #! Acho que isso só saí
         # TODO if globals.no_more_busywating._value == 0 and len(self.rockets) == self.constraints[2]
         #globals.no_more_busywating.acquire()    # Impede busywating das bases
-        
         #if globals.finalize_threads == True:
             #return False
+        #! até aqui, pois esse controle agora rola em bases
         
         if to_define_destiny_dict.get('MARS').acquire(blocking=False): 
             planet = globals.get_planets_ref().get('mars')

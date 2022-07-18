@@ -64,7 +64,7 @@ class Planet(Thread):
         time = globals.get_simulation_time().simulation_time()
         
         globals.acquire_print()
-        print(f'🪐 - [{self.name}] - Terraform completed in {time} years')
+        print(f'\033[1;34m🪐 - [{self.name}] - Terraform completed in {time} years!\033[m')
         globals.release_print()
         
         # Verifica se todos planetas foram terraformados
@@ -73,7 +73,7 @@ class Planet(Thread):
             
             globals.finalize_threads = True # Seta True para finalizar bases, time e mines
                 
-            while active_count() > 2:
+            while active_count() > 2: # Se existem além de MainThread e a última thread planeta ativa
                 with globals.stop_bases:
                     globals.stop_bases.notify_all() # Garante que bases vão finalizar
                 with globals.moon_wait:
@@ -81,7 +81,7 @@ class Planet(Thread):
                 sleep(1)
             
             globals.acquire_print()
-            print(f'\033[1;31mAll planets terraformed in {time} years\033[m')
+            print(f'\n\033[1;32mAll planets terraformed in {time} years!!\033[m\n')
             globals.release_print()
             
         

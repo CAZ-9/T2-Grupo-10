@@ -55,7 +55,7 @@ europa_north_pole = Lock()
 
 # Caso foguetes não possam mais ser lançados para nenhum planeta, as threads travam nesse semáforo
 stop_bases = Condition()
-# no_more_busywating = Semaphore(N*4) # Impede busywaiting das bases
+
 
 # * Sincronização de planetas
 
