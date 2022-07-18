@@ -1,5 +1,5 @@
-from threading import Thread, Condition, Semaphore
-from time import time
+from threading import Thread, Condition, Semaphore, active_count
+from time import sleep
 import globals
 
 
@@ -65,7 +65,7 @@ class Planet(Thread):
             
             break 
         
-        globals.colision_course.get(self.name).release(globals.colision_course.get(self.name)._value)
+        globals.colision_course.get(self.name).release(10)
         planets = globals.get_planets_ref()    
         
         time = globals.get_simulation_time().simulation_time()
@@ -81,6 +81,11 @@ class Planet(Thread):
             globals.acquire_print()
             print(f'All planets terraformed in {time} years')
             globals.release_print()
+            while True:
+                print(active_count())
+                sleep(2)
+                if active_count == 1:
+                    break
             
                 
             

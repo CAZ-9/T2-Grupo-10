@@ -20,7 +20,7 @@ simulation_time = None
 finalize_threads = False # Variável para finalizar threads qnd todos planetas forem terraformados
 
 # Sincronização de pedidos da lua
-moon_request_lion_launch = Semaphore() # Lua da release para solicitar foguete lion
+moon_request_lion_launch = Semaphore(0) # Lua da release para solicitar foguete lion
 moon_wait = Condition()  # Lua aguarda recursos
 next_will_be_lion = Lock()  # Lua da lock para garantir que LION será construido
 

@@ -41,3 +41,6 @@ class Pipeline(Thread):
         
         while(True):
             self.produce()
+            if globals.finalize_threads == True:
+                break    
+        

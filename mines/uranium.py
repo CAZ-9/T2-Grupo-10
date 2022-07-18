@@ -51,5 +51,6 @@ class StoreHouse(Thread):
             pass
         
         while(True):
-
             self.produce()
+            if globals.finalize_threads == True:
+                break    
