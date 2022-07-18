@@ -29,9 +29,6 @@ class Pipeline(Thread):
                 self.print_pipeline()
         globals.available_oil.release() # Incrementa para bases saberem que podem pegar uma porção de óleo
 
-                # Libera para as bases receberem recurso apenas quando o recurso está disponível
-                #globals.delivery_control(
-                #self.unities, globals.oil_units, globals.oil_loads, globals.available_oil)'''
         sleep(0.001)
 
     def run(self):

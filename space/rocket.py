@@ -96,6 +96,7 @@ class Rocket:
         # Dicionario com semaforos que contam 100 lançamentos para um planeta simultaneamente
         to_define_destiny_dict = globals.voyage_to 
         
+        # TODO if globals.no_more_busywating._value == 0 and len(self.rockets) == self.constraints[2]
         globals.no_more_busywating.acquire()    # Impede busywating das bases
         
         if globals.finalize_threads == True:
