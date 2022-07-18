@@ -20,9 +20,8 @@ class Rocket:
         '''Se o planeta for inabitável, após a confirmação do satélite, permite a rota de colisão.
         Caso contrário, a thread chega ao sem fim após printar'''
         
-        
-        globals.colision_course.get(planet.name).acquire() # Aguarda para colisão
-        
+        globals.colision_course.get(planet.name).acquire() # Aguarda para colisão no máximo 2 de cada vez
+
         # retorna inabitabilidade. Se planeta habitável, foguete não colide  ## só pode fornecer isso a uma base de cada vez ##
         if planet.satellite_get_info() > 0:  # Se não está habitável
             self.nuke(planet) # bombardeia o planeta
@@ -31,24 +30,28 @@ class Rocket:
             print(f"✨ - {self.name} ROCKET / ID {self.id}, is indefinitely orbiting {planet.name}.")
             globals.release_print()
 
-    def nuke(self, planet):  # Permitida a alteração
 
-        if globals.pole.get(planet.name).acquire(blocking=False):
+    def nuke(self, planet):  # Permitida a alteração
+        
+        if globals.north_pole.get(planet.name).acquire(blocking=False):
             globals.acquire_print()
             print(f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on North Pole!")
             globals.release_print()
+            planet.planet_takes_damage(self.damage())
+            globals.pole_north.get(planet.name).release()  # Intercalando a colisão
 
-        else:
-            globals.acquire_print()
+        elif globals.south_pole.get(planet.name).acquire():
+            globals.acq-uire_print()
             print(f"🎇 - [EXPLOSION] - The {self.name} ROCKET / ID {self.id}, reached the planet {planet.name} on South Pole!")
             globals.release_print()
-            globals.pole.get(planet.name).release()  # Intercalando a colisão
+            planet.planet_takes_damage(self.damage())
+            globals.pole_south.get(planet.name).release()  # Intercalando a colisão
 
         #! e se o notify, que da release no lock associado, impedir que ocorra outra explosão, até saber a atual vida
         #! até que seja indentificada a explosão pelo planeta
 
         # Decrementa 'damage' da vida do planeta: #! Talvez careça de mutex, caso a inabitabilidade seja uma região crítica
-        planet.planet_takes_damage(self.damage())
+        #! planet.planet_takes_damage(self.damage())
 
         # Dispara condição para acordar o planeta:
 
